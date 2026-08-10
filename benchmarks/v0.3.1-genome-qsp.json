@@ -1,0 +1,38 @@
+{
+  "release": "QSCN v0.3.1",
+  "version": "0.3.1",
+  "date": "2026-08-07",
+  "environment": {
+    "container_platform": "linux/arm64",
+    "docker_server": "29.7.1",
+    "hmmer": "3.4",
+    "prodigal": "2.6.3",
+    "build_revision": "unknown",
+    "build_timestamp": "unknown"
+  },
+  "input": {
+    "archive": "demo_consortium/20_species_GCF/20_species_GCF.zip",
+    "redistribution_status": "unconfirmed; local regression only",
+    "samples": 20,
+    "total_nucleotides": 83257908,
+    "predicted_genes": 75659
+  },
+  "run": {
+    "database_id": "qsp",
+    "profiles": 38,
+    "candidate_hits": 3272,
+    "passing_hits": 3272,
+    "wall_seconds_manifest": 138.15525423001964,
+    "hmmscan_wall_seconds_total": 50.51709623093484,
+    "peak_child_rss_kb": 230740,
+    "run_output_bytes": 279157798,
+    "compressed_export_bytes": 51394525
+  },
+  "progress_review": {
+    "observed_overall_progress": [0.0, 0.0875, 0.125, 0.1875, 0.2875, 0.52, 1.0],
+    "phase_order": ["queued", "predicting", "scanning", "complete"],
+    "monotonic": true,
+    "all_predictions_preceded_scanning": true
+  },
+  "review": "The v0.3.1 two-stage genome pipeline completed all 20 samples without progress regression. This run changes execution ordering and UI progress only; database, hit thresholds, capability rules, and biological inference semantics are unchanged."
+}

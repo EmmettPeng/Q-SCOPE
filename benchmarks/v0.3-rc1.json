@@ -1,0 +1,42 @@
+{
+  "release": "QSCN v0.3 RC1",
+  "version": "0.3.0-rc.1",
+  "date": "2026-08-06",
+  "environment": {
+    "container_platform": "linux/arm64",
+    "docker_server": "29.6.2",
+    "hmmer": "3.4",
+    "prodigal": "2.6.3",
+    "build_revision": "unknown",
+    "build_timestamp": "unknown"
+  },
+  "input": {
+    "archive": "demo_consortium/demo_consortium.zip",
+    "samples": 7,
+    "proteins": 21918,
+    "total_residues": 7169553
+  },
+  "runs": [
+    {
+      "database_id": "qsp",
+      "profiles": 38,
+      "candidate_hits": 873,
+      "passing_hits": 873,
+      "wall_seconds_manifest": 14.133,
+      "peak_rss_kb": 30592,
+      "run_output_bytes": 31319854,
+      "compressed_export_bytes": 1402116
+    },
+    {
+      "database_id": "kegg-m02024",
+      "profiles": 281,
+      "candidate_hits": 20038,
+      "passing_hits": 16900,
+      "wall_seconds_manifest": 129.932,
+      "peak_rss_kb": 251092,
+      "run_output_bytes": 95919359,
+      "compressed_export_bytes": 8353813
+    }
+  ],
+  "review": "Baseline accepted for RC1. Future database, threshold, HMMER, or pipeline changes require manual result-difference review."
+}

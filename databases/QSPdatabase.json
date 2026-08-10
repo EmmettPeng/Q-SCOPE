@@ -1,0 +1,157 @@
+{
+    "LuxM_LuxN_system":[
+                    {
+                        "Signal_type": "HSLs"
+                    },
+                    {
+                        "Signal_Sending":["LuxM"]
+                    },
+                    {
+                        "Signal_Receiving": ["LuxN"]
+                    },
+                    {
+                        "References": [
+                            "https://doi.org/10.1128/jb.183.12.3537-3547.2001",
+                            "https://doi.org/10.1128/JB.181.18.5766-5770.1999",
+                            "https://doi.org/10.1046/j.1365-2958.2000.01684.x",
+                            "https://doi.org/10.1016/j.ijmm.2006.01.044",
+                            "https://doi.org/10.1146/annurev.cellbio.21.012704.131001",
+                            "https://doi.org/10.1128/JB.186.20.6902-6914.2004"
+                        ]
+                    }
+    ],
+    "LuxI_LuxR_system":[
+                    {
+                        "Signal_type": "HSLs"
+                    },
+                    {
+                        "Signal_Sending": ["LuxI"]
+                    },
+                    {
+                        "Signal_Receiving": ["LuxR"]
+                    },
+                    {
+                        "References": [
+                            "https://doi.org/10.1007/s10867-010-9186-4",
+                            "https://doi.org/10.1073/pnas.93.18.9505",
+                            "https://doi.org/10.1038/msb.2011.30"
+                        ]
+                    }
+    ],
+    "LuxS_LuxPQ_system":[
+                    {
+                        "Signal_type": "AI-2"
+                    },
+                    {
+                        "Signal_Sending": ["LuxS"]
+                    },
+                    {
+                        "Signal_Receiving": ["LuxP", "LuxQ"]
+                    },
+                    {
+                        "References": [
+                            "https://doi.org/10.1128/jb.183.3.892-900.2001",
+                            "https://doi.org/10.1128/jb.186.14.4705-4717.2004",
+                            "https://doi.org/10.1128/jb.186.10.3620-3631.2004"
+                        ]
+                    }
+    ],
+    "LsrABC_system":[
+                {
+                    "Signal_type": "AI-2"
+                },
+                {
+                    "Signal_Sending": ["LuxS"]
+                },
+                {
+                    "Signal_Receiving": ["LsrA", "LsrB", "LsrC", "LsrD", "LsrK", "LsrR"]
+                },
+                {
+                    "References": [
+                        "https://doi.org/10.1128/JCM.05895-11",
+                        "https://doi.org/10.1046/j.1365-2958.2001.02669.x",
+                        "https://doi.org/10.1021/ja4024989",
+                        "https://doi.org/10.1128/JB.187.1.238-248.2005",
+                        "https://doi.org/10.1128/JB.187.6.2066-2076.2005",
+                        "https://doi.org/10.1128/JB.00014-07"
+                    ]
+                }
+    ],
+    "Rpf_system":[
+                {
+                    "Signal_type": "DSF"
+                },
+                {
+                    "Signal_Sending": ["RpfF"]
+                },
+                {
+                    "Signal_Receiving": ["RpfC", "RpfG"]
+                },
+                {
+                    "References": [
+                        "https://doi.org/10.1146/annurev.phyto.45.062806.094342",
+                        "https://doi.org/10.1126/stke.121pe23",
+                        "https://doi.org/10.1046/j.1365-2958.1997.3721736.x",
+                        "https://doi.org/10.1073/pnas.0600345103"
+                    ]
+                }
+    ],
+    "c-di-GMP_pathway":[
+                {
+                    "Signal_type": "c-di-GMP"
+                },
+                {
+                    "Signal_Sending": ["DGC"]
+                },
+                {
+                    "Signal_Receiving": ["Clp"]
+                },
+                {
+                    "References": [
+                        "https://doi.org/10.1074/jbc.R115.711507",
+                        "https://doi.org/10.1128/JB.01253-09",
+                        "https://doi.org/10.1128/JB.187.22.7795-7804.2005"
+                    ]
+                }
+    ],
+    "Cqs_system":[
+                {
+                    "Signal_type": "CAI-1 (AHKs)"
+                },
+                {
+                    "Signal_Sending": ["CqsA"]
+                },
+                {
+                    "Signal_Receiving": ["CqsS"]
+                },
+                {
+                    "References": [
+                        "https://doi.org/10.1016/S0092-8674(02)00829-2",
+                        "https://doi.org/10.1016/j.ijmm.2006.01.044",
+                        "https://doi.org/10.1146/annurev.cellbio.21.012704.131001",
+                        "https://doi.org/10.1128/JB.186.20.6902-6914.2004"
+                    ]
+                }
+    ],
+    "Pqs_operon_system":[
+                {
+                    "Signal_type": "PQS"
+                },
+                {
+                    "Signal_Sending": ["PqsA", "PqsB", "PqsC", "PqsD", "PqsE", "PhnA", "PhnB", "PqsH"]
+                },
+                {
+                    "Signal_Receiving": ["PqsR"]
+                },
+                {
+                    "References": [
+                        "https://doi.org/10.1128/jb.172.2.884-900.1990",
+                        "https://doi.org/10.1074/jbc.M804555200",
+                        "https://doi.org/10.1021/bi9009055",
+                        "https://doi.org/10.1128/JB.00753-08",
+                        "https://doi.org/10.1111/j.1365-2958.2010.07303.x",
+                        "https://doi.org/10.1371/journal.ppat.0030035"
+                    ]
+                }
+    ]
+}

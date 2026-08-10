@@ -1,0 +1,638 @@
+{
+	"Vibrio_LuxS_LuxPQ_system":[
+		{
+			"Signal_type": "AI-2"
+		},
+		{
+			"Signal_Sending": ["K07173"]
+		},
+		{
+			"Signal_Receiving": ["K10910", "K10909", "K10911", "K10912"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1128/JCM.05895-11",
+				"https://doi.org/10.1016/j.ijmm.2006.01.044",
+				"https://doi.org/10.1146/annurev.cellbio.21.012704.131001",
+				"https://doi.org/10.1128/JB.186.20.6902-6914.2004",
+				"https://doi.org/10.1128/JB.179.12.4043-4045.1997",
+				"https://doi.org/10.1016/S0092-8674(02)00829-2",
+				"https://doi.org/10.1046/j.1365-2958.1999.01208.x"
+			]
+		}
+	],
+	"Vibrio_LuxM_LuxN_system":[
+		{
+			"Signal_type": "AI-1"
+		},
+		{
+			"Signal_Sending": ["K13062"]
+		},
+		{
+			"Signal_Receiving": ["K15850", "K10911", "K10912"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1128/JB.181.18.5766-5770.1999",
+				"https://doi.org/10.1046/j.1365-2958.2000.01684.x",
+				"https://doi.org/10.1016/j.ijmm.2006.01.044",
+				"https://doi.org/10.1146/annurev.cellbio.21.012704.131001",
+				"https://doi.org/10.1128/JB.186.20.6902-6914.2004",
+				"https://doi.org/10.1016/S0092-8674(02)00829-2",
+				"https://doi.org/10.1046/j.1365-2958.1999.01208.x"
+			]
+		}
+	],
+	"Vibrio_CqsA_CqsS_system":[
+		{
+			"Signal_type": "CAI-1"
+		},
+		{
+			"Signal_Sending": ["K10915"]
+		},
+		{
+			"Signal_Receiving": ["K10916", "K10911", "K10912"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1016/S0092-8674(02)00829-2",
+				"https://doi.org/10.1016/j.ijmm.2006.01.044",
+				"https://doi.org/10.1146/annurev.cellbio.21.012704.131001",
+				"https://doi.org/10.1128/JB.186.20.6902-6914.2004",
+				"https://doi.org/10.1046/j.1365-2958.1999.01208.x"
+			]
+		}
+	],
+	"Vibrio_LuxI_LuxR_system":[
+		{
+			"Signal_type": "AI-1"
+		},
+		{
+			"Signal_Sending": ["K22954"]
+		},
+		{
+			"Signal_Receiving": ["K15852"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1073/pnas.93.18.9505",
+				"https://doi.org/10.1016/j.ijmm.2006.01.044",
+				"https://doi.org/10.1038/msb.2011.30"
+			]
+		}
+	],
+	"Pseudomonas_aeruginosa_LasI_LasR_system":[
+		{
+			"Signal_type": "AI-1"
+		},
+		{
+			"Signal_Sending": ["K13060"]
+		},
+		{
+			"Signal_Receiving": ["K18304"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1073/pnas.93.18.9505",
+				"https://doi.org/10.1111/j.1365-2958.2004.04211.x",
+				"https://doi.org/10.1128/MMBR.05007-11"
+			]
+		}
+	],
+	"Pseudomonas_aeruginosa_Pqs_operon_system":[
+		{
+			"Signal_type": "HHQ/PQS"
+		},
+		{
+			"Signal_Sending": ["K01657", "K01658", "K18000", "K18001", "K18002", "K18003", "K20257", "K17940"]
+		},
+		{
+			"Signal_Receiving": ["K19735"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1128/jb.172.2.884-900.1990",
+				"https://doi.org/10.1074/jbc.M804555200",
+				"https://doi.org/10.1021/bi9009055",
+				"https://doi.org/10.1074/jbc.M804555200",
+				"https://doi.org/10.1128/JB.00753-08",
+				"https://doi.org/10.1111/j.1365-2958.2010.07303.x",
+				"https://doi.org/10.1371/journal.ppat.0030035"
+			]
+		}
+	],
+	"Pseudomonas_aeruginosa_PhlI_PhlR_system/Pseudomonas_PhzI_PhzR_system":[
+		{
+			"Signal_type": "AI-1"
+		},
+		{
+			"Signal_Sending": ["K13061"]
+		},
+		{
+			"Signal_Receiving": ["K18099"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1021/bi048005m"
+			]
+		}
+	],
+	"Escherichia_coli_LsrABC_system":[
+		{
+			"Signal_type": "AI-2"
+		},
+		{
+			"Signal_Sending": ["K07173"]
+		},
+		{
+			"Signal_Receiving": ["K10555", "K10556", "K10557", "K10558", "K11216", "K11531"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1128/JCM.05895-11",
+				"https://doi.org/10.1016/S0923-2508(01)01201-3",
+				"https://doi.org/10.1046/j.1365-2958.2001.02669.x",
+				"https://doi.org/10.1021/ja4024989",
+				"https://doi.org/10.1128/JB.187.1.238-248.2005",
+				"https://doi.org/10.1128/JB.187.6.2066-2076.2005",
+				"https://doi.org/10.1128/JB.00014-07"
+			]
+		}
+	],
+	"Rhodopseudomonas_palustris_RpaI_RpaR_system":[
+		{
+			"Signal_type": "AI-1"
+		},
+		{
+			"Signal_Sending": ["K18096"]
+		},
+		{
+			"Signal_Receiving": ["K18098"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1073/pnas.1114125108",
+				"https://doi.org/10.1038/nature07088",
+				"https://doi.org/10.1073/pnas.1103821108",
+				"https://doi.org/10.1073/pnas.1114125108"
+			]
+		}
+	],
+	"Rhizobium_leguminosarum_CinI_CinR_system":[
+		{
+			"Signal_type": "AI-1"
+		},
+		{
+			"Signal_Sending": ["K20248"]
+		},
+		{
+			"Signal_Receiving": ["K20252"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1046/j.1365-2958.2000.01960.x",
+				"https://doi.org/10.1046/j.1365-2958.2003.03699.x"
+			]
+		}
+	],
+	"Rhizobium_leguminosarum_CinI_BisR_system":[
+		{
+			"Signal_type": "AI-1"
+		},
+		{
+			"Signal_Sending": ["K20248"]
+		},
+		{
+			"Signal_Receiving": ["K20253"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1046/j.1365-2958.2000.01960.x",
+				"https://doi.org/10.1046/j.1365-2958.2003.03699.x"
+			]
+		}
+	],
+	"TraI_TraR_system":[
+		{
+			"Signal_type": "AI-1"
+		},
+		{
+			"Signal_Sending": ["K22955"]
+		},
+		{
+			"Signal_Receiving": ["K19732"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1046/j.1365-2958.2003.03699.x",
+				"https://doi.org/10.1038/362448a0"
+			]
+		}
+	],
+	"Rhizobium_leguminosarum_RaiI_RaiR_system":[
+		{
+			"Signal_type": "AI-1"
+		},
+		{
+			"Signal_Sending": ["K20249"]
+		},
+		{
+			"Signal_Receiving": ["K25873"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1128/JB.180.4.815-821.1998",
+				"https://doi.org/10.1128/JB.184.6.1597-1606.2002"
+			]
+		}
+	],
+	"Rhizobium_leguminosarum_RhiI_RhiR_system":[
+		{
+			"Signal_type": "AI-1"
+		},
+		{
+			"Signal_Sending": ["K18096"]
+		},
+		{
+			"Signal_Receiving": ["K18098"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1073/pnas.1114125108",
+				"https://doi.org/10.1038/nature07088",
+				"https://doi.org/10.1073/pnas.1103821108",
+				"https://doi.org/10.1073/pnas.1114125108"
+			]
+		}
+	],
+	"Erwinia_Serratia_ExpI_ExpR_system":[
+		{
+			"Signal_type": "AI-1"
+		},
+		{
+			"Signal_Sending": ["K22956"]
+		},
+		{
+			"Signal_Receiving": ["K19734"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1046/j.1365-2958.1998.01022.x",
+				"https://doi.org/10.1128/AEM.69.7.3901-3910.2003"
+			]
+		}
+	],
+	"Pantoea_stewartii_EsaI_EsaR_system":[
+		{
+			"Signal_type": "AI-1"
+		},
+		{
+			"Signal_Sending": ["K22956"]
+		},
+		{
+			"Signal_Receiving": ["K19734"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1046/j.1365-2958.1998.01022.x",
+				"https://doi.org/10.1128/AEM.69.7.3901-3910.2003"
+			]
+		}
+	],
+	"Bcc_CepI_CepR_system":[
+		{
+			"Signal_type": "AI-1"
+		},
+		{
+			"Signal_Sending": ["K13061"]
+		},
+		{
+			"Signal_Receiving": ["K19666"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1021/bi048005m",
+				"https://doi.org/10.1128/JB.179.22.7089-7097.1997",
+				"https://doi.org/10.1146/annurev-phyto-081211-173000"
+			]
+		}
+	],
+	"Bcc_CciI_CciR_system":[
+		{
+			"Signal_type": "AI-1"
+		},
+		{
+			"Signal_Sending": ["K20250"]
+		},
+		{
+			"Signal_Receiving": ["K19731"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1128/IAI.73.8.4982-4992.2005",
+				"https://doi.org/10.1186/1471-2164-10-441"
+			]
+		}
+	],
+	"Bcc_Rpf_system":[
+		{
+			"Signal_type": "BDSF"
+		},
+		{
+			"Signal_Sending": ["K13816"]
+		},
+		{
+			"Signal_Receiving": ["K14051"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1146/annurev.phyto.45.062806.094342",
+				"https://doi.org/10.1126/stke.121pe23",
+				"https://doi.org/10.1046/j.1365-2958.1997.3721736.x",
+				"https://doi.org/10.1111/j.1365-2958.2006.05440.x",
+				"https://doi.org/10.1128/JB.00424-15"
+			]
+		}
+	],
+	"Xanthomonas_campestris_Rpf_system":[
+		{
+			"Signal_type": "DSF"
+		},
+		{
+			"Signal_Sending": ["K01897", "K13816"]
+		},
+		{
+			"Signal_Receiving": ["K10715", "K13815"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1146/annurev.phyto.45.062806.094342",
+				"https://doi.org/10.1126/stke.121pe23",
+				"https://doi.org/10.1046/j.1365-2958.1997.3721736.x",
+				"https://doi.org/10.1073/pnas.0600345103"
+			]
+		}
+	],
+	"Burkholderia_glumae_TofI_TofR_system":[
+		{
+			"Signal_type": "AI-1"
+		},
+		{
+			"Signal_Sending": ["K13061"]
+		},
+		{
+			"Signal_Receiving": ["K19666"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1021/bi048005m",
+				"https://doi.org/10.1128/JB.179.22.7089-7097.1997",
+				"https://doi.org/10.1146/annurev-phyto-081211-173000"
+			]
+		}
+	],
+	"Chromobacterium_violaceum_CviI_CviR_system":[
+		{
+			"Signal_type": "AI-1"
+		},
+		{
+			"Signal_Sending": ["K22957"]
+		},
+		{
+			"Signal_Receiving": ["K20334"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1128/JB.05125-11"
+			]
+		}
+	],
+	"Agrobacterium_vitiae_AvsI_AvsR_system":[
+		{
+			"Signal_type": "AI-1"
+		},
+		{
+			"Signal_Sending": ["K22968"]
+		},
+		{
+			"Signal_Receiving": ["K19733"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1128/JB.184.20.5686-5695.2002",
+				"https://doi.org/10.1007/s10482-007-9201-3"
+			]
+		}
+	],
+	"Staphylococcus_aureus_AIP_system":[
+		{
+			"Signal_type": "AIP"
+		},
+		{
+			"Signal_Sending": ["K07800", "K07813"]
+		},
+		{
+			"Signal_Receiving": ["K07706", "K07707"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1128/iai.68.5.2579-2586.2000",
+				"https://doi.org/10.1074/jbc.M205367200",
+				"https://doi.org/10.1111/j.1574-6968.1998.tb13018.x"
+			]
+		}
+	],
+	"Clostridium_difficile_AIP_system":[
+		{
+			"Signal_type": "AIP"
+		},
+		{
+			"Signal_Sending": ["K07800", "K07813"]
+		},
+		{
+			"Signal_Receiving": ["K20339", "K20340"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1128/iai.68.5.2579-2586.2000",
+				"https://doi.org/10.1074/jbc.M205367200",
+				"https://doi.org/10.1128/mBio.02569-14"
+			]
+		}
+	],
+	"Streptococcus_ComC(K12415)_ComD_system":[
+		{
+			"Signal_type": "CSP"
+		},
+		{
+			"Signal_Sending": ["K12415", "K12292", "K12293"]
+		},
+		{
+			"Signal_Receiving": ["K12294", "K12295"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1016/j.femsle.2005.09.008",
+				"https://doi.org/10.1016/j.tim.2006.06.007",
+				"https://doi.org/10.1016/0378-1119(94)00841-F",
+				"https://doi.org/10.1128/JB.01053-09"
+			]
+		}
+	],
+	"Streptococcus_ComC(K23133)_ComD_system":[
+		{
+			"Signal_type": "CSP"
+		},
+		{
+			"Signal_Sending": ["K23133", "K12292", "K12293"]
+		},
+		{
+			"Signal_Receiving": ["K12294", "K12295"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1111/j.1574-6968.2006.00593.x",
+				"https://doi.org/10.1016/j.tim.2006.06.007",
+				"https://doi.org/10.1016/0378-1119(94)00841-F",
+				"https://doi.org/10.1128/JB.01053-09"
+			]
+		}
+	],
+	"Streptococcus_BlpC_system":[
+		{
+			"Signal_type": "Blp"
+		},
+		{
+			"Signal_Sending": ["K20343", "K20344", "K20345"]
+		},
+		{
+			"Signal_Receiving": ["K07706", "K07707"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1128/mBio.00179-11",
+				"https://doi.org/10.1074/jbc.273.36.23134",
+				"https://doi.org/10.1111/j.1574-6968.1998.tb13018.x"
+			]
+		}
+	],
+	"pCF10_Donor_produced_inhibitor":[
+		{
+			"Signal_type": "iCF10"
+		},
+		{
+			"Signal_Sending": ["K20376"]
+		},
+		{
+			"Signal_Receiving": ["K15580" ,"K15581" ,"K15582", "K15583", "K10823", "K20377"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1128/JB.176.23.7405-7408.1994",
+				"https://doi.org/10.1529/biophysj.107.120964",
+				"https://doi.org/10.1128/JB.01760-06",
+				"https://doi.org/10.1128/JB.00274-07",
+				"https://doi.org/10.1074/jbc.M404343200",
+				"https://doi.org/10.1006/plas.1996.0005"
+			]
+		}
+	],
+	"pCF10_Recipient_produced_activator":[
+		{
+			"Signal_type": "cCF10"
+		},
+		{
+			"Signal_Sending": ["K03217"]
+		},
+		{
+			"Signal_Receiving": ["K15580" ,"K15581" ,"K15582", "K15583", "K10823", "K20377"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1074/jbc.M403229200",
+				"https://doi.org/10.1016/j.tim.2007.03.001",
+				"https://doi.org/10.1529/biophysj.107.120964",
+				"https://doi.org/10.1128/JB.01760-06",
+				"https://doi.org/10.1128/JB.00274-07",
+				"https://doi.org/10.1074/jbc.M404343200",
+				"https://doi.org/10.1006/plas.1996.0005"
+			]
+		}
+	],
+	"pAD1_Donor_produced_inhibitor":[
+		{
+			"Signal_type": "iAD1"
+		},
+		{
+			"Signal_Sending": ["K20378"]
+		},
+		{
+			"Signal_Receiving": ["K15580" ,"K15581" ,"K15582", "K15583", "K10823", "K20380"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1016/0147-619X(90)90019-9",
+				"https://doi.org/10.1529/biophysj.107.120964",
+				"https://doi.org/10.1128/JB.01760-06",
+				"https://doi.org/10.1128/JB.00274-07",
+				"https://doi.org/10.1074/jbc.M404343200",
+				"https://doi.org/10.1128/JB.174.6.1821-1827.1992"
+			]
+		}
+	],
+	"pAD1_Recipient_produced_activator":[
+		{
+			"Signal_type": "cAD1"
+		},
+		{
+			"Signal_Sending": ["K20379"]
+		},
+		{
+			"Signal_Receiving": ["K15580" ,"K15581" ,"K15582", "K15583", "K10823", "K20380"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1128/JB.184.7.1880-1887.2002",
+				"https://doi.org/10.1529/biophysj.107.120964",
+				"https://doi.org/10.1128/JB.01760-06",
+				"https://doi.org/10.1128/JB.00274-07",
+				"https://doi.org/10.1074/jbc.M404343200",
+				"https://doi.org/10.1128/JB.174.6.1821-1827.1992"
+			]
+		}
+	],
+	"Enterococcus_faecalis_GBAP_system":[
+		{
+			"Signal_type": "GBAP"
+		},
+		{
+			"Signal_Sending": ["K07813"]
+		},
+		{
+			"Signal_Receiving": ["K07706" ,"K07707"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1128/iai.68.5.2579-2586.2000",
+				"https://doi.org/10.1074/jbc.M205367200",
+				"https://doi.org/10.1111/j.1574-6968.1998.tb13018.x"
+			]
+		}
+	],
+	"Bacillus_ComQXPA_system":[
+		{
+			"Signal_type": "ComX"
+		},
+		{
+			"Signal_Sending": ["K02253", "K02251"]
+		},
+		{
+			"Signal_Receiving": ["K07680" ,"K07691"]
+		},
+		{
+			"References": [
+				"https://doi.org/10.1111/j.1365-2958.2005.04749.x"
+			]
+		}
+	]
+}

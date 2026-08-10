@@ -1,0 +1,94 @@
+services:
+  app:
+    image: qscn:0.3.1
+    build:
+      context: .
+      args:
+        QSCN_BUILD_REVISION: ${QSCN_BUILD_REVISION:-unknown}
+        QSCN_BUILD_TIMESTAMP: ${QSCN_BUILD_TIMESTAMP:-unknown}
+    command: ["uvicorn", "qscn.api:app", "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      QSCN_DATA_DIR: /data
+      QSCN_REDIS_URL: redis://redis:6379/0
+      QSCN_BUILTIN_DATABASE_DIR: /app/database-runtime
+      QSCN_FRONTEND_DIR: /app/frontend-dist
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - qscn_v03_data:/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=1g,mode=1777
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 128
+    mem_limit: ${QSCN_APP_MEMORY:-1g}
+    cpus: ${QSCN_APP_CPUS:-1.0}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+
+  worker:
+    image: qscn:0.3.1
+    build:
+      context: .
+      args:
+        QSCN_BUILD_REVISION: ${QSCN_BUILD_REVISION:-unknown}
+        QSCN_BUILD_TIMESTAMP: ${QSCN_BUILD_TIMESTAMP:-unknown}
+    command: ["rq", "worker", "qscn", "--url", "redis://redis:6379/0", "--with-scheduler"]
+    environment:
+      QSCN_DATA_DIR: /data
+      QSCN_REDIS_URL: redis://redis:6379/0
+      QSCN_BUILTIN_DATABASE_DIR: /app/database-runtime
+      QSCN_FRONTEND_DIR: /app/frontend-dist
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - qscn_v03_data:/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=1g,mode=1777
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 128
+    mem_limit: ${QSCN_WORKER_MEMORY:-8g}
+    cpus: ${QSCN_WORKER_CPUS:-4.0}
+    healthcheck:
+      test: ["CMD", "rq", "info", "--url", "redis://redis:6379/0"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+
+  redis:
+    image: redis:7.2.4-alpine@sha256:c8bb255c3559b3e458766db810aa7b3c7af1235b204cfdb304e79ff388fe1a5a
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - qscn_v03_redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 2s
+      retries: 20
+    restart: unless-stopped
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 64
+    mem_limit: ${QSCN_REDIS_MEMORY:-512m}
+    cpus: ${QSCN_REDIS_CPUS:-0.5}
+
+volumes:
+  qscn_v03_data:
+  qscn_v03_redis:

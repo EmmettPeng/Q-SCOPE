@@ -1,0 +1,26 @@
+{
+  "qsp": {
+    "source_url": null,
+    "source_version": "builtin-v1; upstream version unconfirmed",
+    "build_date": "unconfirmed",
+    "build_method": "unconfirmed; repository contains a combined 38-profile HMM library",
+    "license": "unconfirmed",
+    "redistribution_status": "unconfirmed",
+    "profile_count": 38,
+    "metadata_reference_count": 29,
+    "hmm_sha256": "8ced1a9f9ad4ba34dcd0557e48ae6041b1991d811307b244285cd8a16a67c5f5",
+    "metadata_sha256": "9a0def4fef0cecb15ff34d0a8a3ef0f546c0f454912e543fb62838e2931ce794"
+  },
+  "kegg-m02024": {
+    "source_url": "https://www.kegg.jp/kegg/",
+    "source_version": "m02024; profile source version unconfirmed",
+    "build_date": "unconfirmed",
+    "build_method": "unconfirmed; repository contains a combined 281-profile KEGG-derived HMM library",
+    "license": "KEGG terms apply; redistribution permission unconfirmed",
+    "redistribution_status": "unconfirmed",
+    "profile_count": 281,
+    "metadata_reference_count": 83,
+    "hmm_sha256": "a4409af5a3596c057697db1d5f6259f9f07df05f6d55bef629eed3290a8037f0",
+    "metadata_sha256": "0d867254785cfd0639948b56673bf9793f91d55a1d0dc5add9ea3ed12127916e"
+  }
+}

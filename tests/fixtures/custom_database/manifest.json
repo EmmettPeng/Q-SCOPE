@@ -1,0 +1,18 @@
+{
+  "database_id": "custom-qsp-smoke",
+  "name": "Custom QSP smoke database",
+  "version": "1.0",
+  "source": "QSCN integration fixture",
+  "classification_scheme": "Fixture classification",
+  "threshold_policy": { "type": "ga" },
+  "pathways": [
+    {
+      "pathway_id": "fixture_luxir",
+      "name": "Fixture LuxI/LuxR",
+      "signal_name": "HSL fixture",
+      "sending_profiles": ["LuxI"],
+      "receiving_profiles": ["LuxR"],
+      "references": []
+    }
+  ]
+}
