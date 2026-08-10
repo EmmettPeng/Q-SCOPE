@@ -29,7 +29,7 @@ RUN mkdir -p /app/database-runtime /data \
 ARG QSCN_BUILD_REVISION=unknown
 ARG QSCN_BUILD_TIMESTAMP=unknown
 LABEL org.opencontainers.image.title="QSCN" \
-      org.opencontainers.image.version="0.3.2" \
+      org.opencontainers.image.version="0.4.0" \
       org.opencontainers.image.revision="${QSCN_BUILD_REVISION}" \
       org.opencontainers.image.created="${QSCN_BUILD_TIMESTAMP}" \
       org.opencontainers.image.source="https://github.com/EmmettPeng/QSCN" \

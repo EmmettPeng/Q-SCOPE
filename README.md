@@ -1,29 +1,47 @@
-# QSCN — v0.3.2
+# QSCN — v0.4.0
 
 QSCN is a local, evidence-first research tool for annotating quorum-sensing
 components in microbial genomes or protein sets and reconstructing potential
 microorganism-to-microorganism communication networks.
 
-Current release: **QSCN v0.3.2** (`0.3.2`). It is not a clinical tool,
+Current release: **QSCN v0.4.0** (`0.4.0`). It is not a clinical tool,
 and its network edges are biological inferences rather than experimentally
 validated interactions. Short peptides, partial genes, fragmented MAGs,
 KEGG thresholds, and species-specific pathway labels have not completed an
 independent biological calibration.
 
-## Install on Windows or macOS
+## Install on Windows, macOS, or Linux
 
-QSCN is distributed as a local Docker Desktop application. Release bundles are
-available from [GitHub Releases](https://github.com/EmmettPeng/QSCN/releases),
-and the same multi-architecture image supports Windows x64, Intel Mac, and
-Apple Silicon Mac.
+QSCN is distributed as a local, container-first application. Release bundles
+are available from [GitHub Releases](https://github.com/EmmettPeng/QSCN/releases).
+The same digest-pinned `linux/amd64` and `linux/arm64` image supports Windows
+x64, Intel and Apple Silicon Macs, and amd64/arm64 Linux hosts. QSCN binds only
+to localhost and stores projects in local Docker volumes.
 
-1. Install and start Docker Desktop. Windows must use the WSL 2 Linux-container
-   backend.
-2. Download and extract the Windows or macOS ZIP from the matching QSCN release.
-3. Windows: double-click `windows/QSCN.cmd`. macOS: double-click
-   `macos/QSCN.command`.
-4. The launcher pulls the release image, waits for SQLite, Redis, Worker, QSP,
-   and KEGG readiness, then opens `http://127.0.0.1:8000`.
+### Windows 10/11 x64
+
+1. Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
+   with its WSL 2 Linux-container backend. Docker Desktop does not require a
+   separate Ubuntu distribution for QSCN.
+2. Download and extract `QSCN-v0.4.0-windows.zip`.
+3. Double-click `windows\QSCN.cmd`.
+
+### macOS
+
+1. Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install/mac-install/).
+2. Download and extract `QSCN-v0.4.0-macos.zip`.
+3. On first launch, control-click `macos/QSCN.command` and choose **Open**.
+
+### Ubuntu Linux
+
+1. Install [Docker Engine and Docker Compose v2](https://docs.docker.com/engine/install/ubuntu/).
+2. Download and extract `QSCN-v0.4.0-linux.tar.gz`.
+3. Run `./linux/QSCN.sh`.
+
+The launchers pull the release image, wait for SQLite, Redis, Worker, QSP, and
+KEGG readiness, then open `http://127.0.0.1:8000`. Ubuntu 22.04 and 24.04 LTS
+on amd64/arm64 are the tested Linux hosts; other distributions with a compatible
+Linux Docker Engine and Compose v2 may work but are not in the v0.4.0 host matrix.
 
 Recommended host resources are 4 CPU, 16 GB memory, and 40 GB free disk space.
 The package provides `start`, `stop`, `status`, `logs`, `update`, `backup`, and
@@ -135,7 +153,7 @@ gates are defined in `.github/workflows/`.
 ```bash
 docker compose build
 docker run --rm -v "$PWD":/workspace:ro -w /workspace \
-  -e PYTHONPATH=/workspace/backend qscn:0.3.2 \
+  -e PYTHONPATH=/workspace/backend qscn:0.4.0 \
   python -m unittest discover -s tests -v
 cd frontend && npm test && npm run build && npm audit
 ./scripts/benchmark_demo.sh

@@ -24,7 +24,7 @@ export const displayRedistributionStatus = (status: string): string => redistrib
 
 export const copy = {
   common: {
-    product: 'QSCN', release: 'QSCN v0.3.2 · For research use only', dismissError: 'Dismiss error',
+    product: 'QSCN', release: 'QSCN v0.4.0 · For research use only', dismissError: 'Dismiss error',
     unknown: '—', notDetected: 'No qualifying evidence detected',
     unexpectedError: 'Something went wrong. Try again. If the problem continues, restart the local QSCN services.',
   },
@@ -70,7 +70,7 @@ export const copy = {
     background: 'This analysis can continue in the background.', cancel: 'Cancel analysis', retry: 'Start a new run',
     ruleSummary: (strict: number, total: number) => `${strict} of ${total} roles require all defined components.`,
     provenance: (status: string) => `Redistribution status: ${displayRedistributionStatus(status)}`,
-    legacy: 'This result uses an unsupported schema from before v0.3. Export it with QSCN v0.2.2, then create a new v0.3 project.',
+    legacy: 'This result uses an unsupported schema from before v0.3. Export it with QSCN v0.2.2, then create a new project in the current release.',
   },
   rules: {
     eyebrow: 'CAPABILITY RULES · VERSION 2.0', title: 'Capability criteria by Pathway',
@@ -213,7 +213,7 @@ export const copy = {
     ambiguous_sequence_alphabet: 'The selected protein input contains only nucleotide symbols. Select Nucleotide sequences or provide an unambiguous protein FASTA.',
     disk_space_insufficient: 'The analysis stopped because there is not enough allowed disk space. Free local disk space or increase the configured run limit, then start a new run.',
     analysis_timeout: 'An analysis step exceeded its time limit. Increase the local timeout for this dataset or start a new run with a smaller input.',
-    incompatible_schema: 'This data volume uses an unsupported schema from before v0.3. Export it with QSCN v0.2.2, then use a new v0.3 data volume.',
+    incompatible_schema: 'This data volume uses an unsupported schema from before v0.3. Export it with QSCN v0.2.2, then use a fresh data volume with the current release.',
     analysis_interrupted: 'The analysis was interrupted when QSCN restarted. Start a new run; saved inputs remain available.',
     legacy_run_failed: 'This analysis from an earlier QSCN release did not complete. Start a new run with the current release.',
     unexpected: 'Something went wrong. Try again. If the problem continues, restart the local QSCN services.',

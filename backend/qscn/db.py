@@ -116,7 +116,7 @@ def initialize() -> None:
         if qscn_tables and "application_metadata" not in tables:
             raise SchemaVersionError(
                 "This data volume predates QSCN v0.3. Export it with v0.2.2, "
-                "then start v0.3 with a fresh volume. The old volume was not modified."
+                "then start this release with a fresh volume. The old volume was not modified."
             )
         if "application_metadata" in tables:
             row = connection.execute(
@@ -124,7 +124,7 @@ def initialize() -> None:
             ).fetchone()
             if row and row["value"] != SCHEMA_VERSION:
                 raise SchemaVersionError(
-                    f"Unsupported QSCN schema {row['value']}; v0.3 requires schema {SCHEMA_VERSION}. "
+                    f"Unsupported QSCN schema {row['value']}; this release requires schema {SCHEMA_VERSION}. "
                     "The existing volume was not modified."
                 )
         connection.executescript(SCHEMA)

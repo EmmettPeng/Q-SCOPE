@@ -85,3 +85,55 @@ jobs:
             [ref]$parseErrors
           ) | Out-Null
           if ($parseErrors.Count) { $parseErrors | Format-List | Out-String | Write-Error }
+      - name: Test PowerShell launcher behavior
+        shell: powershell
+        run: tests/windows_launcher.ps1
+
+  shell-launchers:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            script: packaging/linux/qscn.sh
+            wrapper: packaging/linux/qscn.sh
+          - os: macos-latest
+            script: packaging/macos/qscn.sh
+            wrapper: packaging/macos/QSCN.command
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Parse and inspect launcher
+        shell: bash
+        run: |
+          sh -n "${{ matrix.script }}"
+          sh -n "${{ matrix.wrapper }}"
+          test -x "${{ matrix.script }}"
+          test -x "${{ matrix.wrapper }}"
+
+  release-packages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Build three platform packages
+        env:
+          QSCN_RELEASE_OUTPUT_DIR: ${{ runner.temp }}/qscn-releases
+        run: >-
+          ./scripts/package_release.sh 0.4.0
+          ghcr.io/emmettpeng/qscn@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      - name: Verify checksums and package contents
+        env:
+          RELEASE_DIR: ${{ runner.temp }}/qscn-releases
+        shell: bash
+        run: |
+          cd "$RELEASE_DIR"
+          sha256sum --check SHA256SUMS
+          unzip -q QSCN-v0.4.0-windows.zip -d windows
+          unzip -q QSCN-v0.4.0-macos.zip -d macos
+          tar -xzf QSCN-v0.4.0-linux.tar.gz -C .
+          test -f windows/QSCN-v0.4.0-windows/windows/QSCN.cmd
+          test -f macos/QSCN-v0.4.0-macos/macos/QSCN.command
+          test -x QSCN-v0.4.0-linux/linux/QSCN.sh
+          test -f QSCN-v0.4.0-linux/.env.example
+          grep -q 'ghcr.io/emmettpeng/qscn@sha256:aaaa' QSCN-v0.4.0-linux/compose.yml
+          ! grep -q '__QSCN_IMAGE__' QSCN-v0.4.0-linux/compose.yml
+          ! grep -R -q 'down -v' windows macos QSCN-v0.4.0-linux

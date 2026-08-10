@@ -2,7 +2,7 @@ name: qscn
 
 services:
   app:
-    image: qscn:0.3.2
+    image: qscn:0.4.0
     build:
       context: .
       args:
@@ -40,7 +40,7 @@ services:
       retries: 12
 
   worker:
-    image: qscn:0.3.2
+    image: qscn:0.4.0
     build:
       context: .
       args:

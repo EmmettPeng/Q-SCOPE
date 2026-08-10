@@ -2,7 +2,7 @@ name: qscn
 
 services:
   app:
-    image: ${QSCN_IMAGE:-ghcr.io/emmettpeng/qscn:0.3.2}
+    image: __QSCN_IMAGE__
     command: ["uvicorn", "qscn.api:app", "--host", "0.0.0.0", "--port", "8000"]
     ports:
       - "127.0.0.1:${QSCN_PORT:-8000}:8000"
@@ -35,7 +35,7 @@ services:
       retries: 12
 
   worker:
-    image: ${QSCN_IMAGE:-ghcr.io/emmettpeng/qscn:0.3.2}
+    image: __QSCN_IMAGE__
     command: ["rq", "worker", "qscn", "--url", "redis://redis:6379/0", "--with-scheduler"]
     environment:
       QSCN_DATA_DIR: /data

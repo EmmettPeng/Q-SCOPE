@@ -6,6 +6,24 @@
 
 - 暂无。
 
+## QSCN v0.4.0 — 2026-08-10
+
+### Container-first 多平台发布
+
+- 正式发布边界统一为同一个 `linux/amd64`、`linux/arm64` 多架构容器镜像，不开发原生 Windows container、桌面应用或系统依赖安装器。
+- Windows 10/11 x64 与 Intel/Apple Silicon macOS 继续使用 Docker Desktop；Ubuntu 22.04/24.04 LTS amd64/arm64 使用 Docker Engine 与 Compose v2。新增 Linux 启动器及 `tar.gz` 发布包，三个平台均提供 start、stop、status、logs、update、backup、restore 和 doctor。
+- 发布产物统一为 Windows/macOS ZIP、Linux tar.gz 与 `SHA256SUMS`；三个包中的 Compose 均固定到同一个 GHCR multi-architecture manifest digest，仅绑定 localhost。
+- 发布包改为携带 `.env.example`，启动器仅在缺失时创建 `.env`。从 v0.3.2 复制的旧 `.env` 会备份并移除失效的 `QSCN_IMAGE` 行，端口及资源设置保持不变。
+- 保留 `qscn_qscn_v03_data` 与 `qscn_qscn_v03_redis`，升级、停止和更新不删除数据卷；schema `3`、数据库、HMM 命中阈值和 hit/capability/scope 规则均未改变，已有分析无需迁移或重扫。
+- 根 README 和平台包新增英文最短安装流程，明确 Windows 不需要额外安装 Ubuntu，Linux 正式宿主矩阵为 Ubuntu 22.04/24.04 LTS amd64/arm64。
+
+### 验证
+
+- 本机 `linux/arm64` 镜像构建通过，镜像内 HMMER 3.4、Prodigal 2.6.3、QSP 38 profiles 与 KEGG 281 profiles 检查通过；后端与打包共 54 tests passed。
+- 前端 13 tests passed，production build passed，`npm audit --audit-level=high` 为 0 vulnerabilities；保留主 chunk 约 503 kB 的既有非阻塞警告。
+- Windows/macOS/Linux 三个发布包生成、SHA-256、Linux executable bit 与 digest-rendered Compose 校验通过；隔离 Compose readiness 全部通过，Playwright 完整发布流程 1 test passed。
+- Windows、Intel Mac 及 Ubuntu 22.04/24.04 各架构的真实宿主冷安装仍属于正式 tag 前的平台验收项，未提前标记为完成。
+
 ## QSCN v0.3.2 — 2026-08-10
 
 ### Windows/macOS 封装与发布
