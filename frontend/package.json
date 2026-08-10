@@ -1,8 +1,8 @@
 {
   "name": "qscn-local",
   "private": true,
-  "version": "0.3.1",
-  "release": "QSCN v0.3.1",
+  "version": "0.3.2",
+  "release": "QSCN v0.3.2",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",

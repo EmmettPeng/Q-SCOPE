@@ -9,8 +9,8 @@ FROM python:3.12-slim@sha256:57cd7c3a7a273101a6485ba99423ee568157882804b1124b4dd
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-       hmmer=3.4+dfsg-2+b2 \
-       prodigal=1:2.6.3-6+b1 \
+       'hmmer=3.4+dfsg-2*' \
+       'prodigal=1:2.6.3-6*' \
     && rm -rf /var/lib/apt/lists/* \
     && groupadd --system qscn \
     && useradd --system --gid qscn --home-dir /app --shell /usr/sbin/nologin qscn
@@ -29,9 +29,10 @@ RUN mkdir -p /app/database-runtime /data \
 ARG QSCN_BUILD_REVISION=unknown
 ARG QSCN_BUILD_TIMESTAMP=unknown
 LABEL org.opencontainers.image.title="QSCN" \
-      org.opencontainers.image.version="0.3.1" \
+      org.opencontainers.image.version="0.3.2" \
       org.opencontainers.image.revision="${QSCN_BUILD_REVISION}" \
       org.opencontainers.image.created="${QSCN_BUILD_TIMESTAMP}" \
+      org.opencontainers.image.source="https://github.com/EmmettPeng/QSCN" \
       org.opencontainers.image.licenses="Apache-2.0"
 ENV QSCN_BUILD_REVISION=${QSCN_BUILD_REVISION} QSCN_BUILD_TIMESTAMP=${QSCN_BUILD_TIMESTAMP}
 USER qscn:qscn

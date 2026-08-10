@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: frontend
+      - name: Test frontend
+        run: npm test
+        working-directory: frontend
+      - name: Build frontend
+        run: npm run build
+        working-directory: frontend
+      - name: Audit frontend dependencies
+        run: npm audit --audit-level=high
+        working-directory: frontend
+
+  container:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            arch: amd64
+          - platform: linux/arm64
+            arch: arm64
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8 # v4.2.0
+      - uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
+      - name: Build ${{ matrix.platform }} image
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          context: .
+          platforms: ${{ matrix.platform }}
+          load: true
+          tags: qscn:ci-${{ matrix.arch }}
+          build-args: |
+            QSCN_BUILD_REVISION=${{ github.sha }}
+            QSCN_BUILD_TIMESTAMP=ci
+          cache-from: type=gha,scope=qscn-${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=qscn-${{ matrix.arch }}
+      - name: Run backend and packaging tests
+        run: >-
+          docker run --rm --platform ${{ matrix.platform }}
+          -v "$GITHUB_WORKSPACE:/workspace:ro" -w /workspace
+          -e PYTHONPATH=/workspace/backend qscn:ci-${{ matrix.arch }}
+          python -m unittest discover -s tests -v
+      - name: Verify bundled tools and database indexes
+        run: >-
+          docker run --rm --platform ${{ matrix.platform }} qscn:ci-${{ matrix.arch }}
+          sh -c 'hmmscan -h >/dev/null && prodigal -v >/dev/null 2>&1 &&
+          test -f /app/database-runtime/QSPdatabase.hmm.h3p &&
+          test -f /app/database-runtime/kegg_m02024.hmm.h3p'
+
+  windows-launcher:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Parse PowerShell launcher
+        shell: powershell
+        run: |
+          $tokens = $null
+          $parseErrors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path 'packaging/windows/qscn.ps1'),
+            [ref]$tokens,
+            [ref]$parseErrors
+          ) | Out-Null
+          if ($parseErrors.Count) { $parseErrors | Format-List | Out-String | Write-Error }

@@ -1,16 +1,36 @@
-# QSCN — v0.3.1
+# QSCN — v0.3.2
 
 QSCN is a local, evidence-first research tool for annotating quorum-sensing
 components in microbial genomes or protein sets and reconstructing potential
 microorganism-to-microorganism communication networks.
 
-Current release: **QSCN v0.3.1** (`0.3.1`). It is not a clinical tool,
+Current release: **QSCN v0.3.2** (`0.3.2`). It is not a clinical tool,
 and its network edges are biological inferences rather than experimentally
 validated interactions. Short peptides, partial genes, fragmented MAGs,
 KEGG thresholds, and species-specific pathway labels have not completed an
 independent biological calibration.
 
-## Start locally
+## Install on Windows or macOS
+
+QSCN is distributed as a local Docker Desktop application. Release bundles are
+available from [GitHub Releases](https://github.com/EmmettPeng/QSCN/releases),
+and the same multi-architecture image supports Windows x64, Intel Mac, and
+Apple Silicon Mac.
+
+1. Install and start Docker Desktop. Windows must use the WSL 2 Linux-container
+   backend.
+2. Download and extract the Windows or macOS ZIP from the matching QSCN release.
+3. Windows: double-click `windows/QSCN.cmd`. macOS: double-click
+   `macos/QSCN.command`.
+4. The launcher pulls the release image, waits for SQLite, Redis, Worker, QSP,
+   and KEGG readiness, then opens `http://127.0.0.1:8000`.
+
+Recommended host resources are 4 CPU, 16 GB memory, and 40 GB free disk space.
+The package provides `start`, `stop`, `status`, `logs`, `update`, `backup`, and
+confirmed `restore` commands. Normal stop and update operations never delete
+the stable `qscn_qscn_v03_data` and `qscn_qscn_v03_redis` volumes.
+
+## Build from source
 
 Requirements: Docker with Docker Compose v2. QSCN binds only to localhost.
 
@@ -29,7 +49,7 @@ curl --fail http://localhost:8000/api/health
 curl --fail http://localhost:8000/api/readiness
 ```
 
-Project inputs and results remain in the `qscn_v03_data` volume until the user
+Project inputs and results remain in the `qscn_qscn_v03_data` volume until the user
 explicitly deletes them. The application never deletes a Docker volume.
 
 ## Required fresh install from v0.2
@@ -101,19 +121,21 @@ reported as `unconfirmed`.
 
 ## Licensing and release status
 
-QSCN-authored code is Apache-2.0. This does not license bundled third-party
-data. Read `THIRD_PARTY_DATA.md`, `THIRD_PARTY_SOFTWARE.md`, and
-`databases/provenance.json` before redistributing or using the databases.
+QSCN-authored code is Apache-2.0. QSP and KEGG-related data remain third-party
+data rather than Apache-2.0 code; the project owner confirmed on 2026-08-10
+that the supplied copies may be distributed with QSCN. Their known provenance,
+remaining upstream-version details, and applicable terms are recorded in
+`THIRD_PARTY_DATA.md` and `databases/provenance.json`.
 
 Release history is recorded in `CHANGELOG.md`; automated build and release
-gates are defined in `.github/workflows/` when present.
+gates are defined in `.github/workflows/`.
 
 ## Development checks
 
 ```bash
 docker compose build
 docker run --rm -v "$PWD":/workspace:ro -w /workspace \
-  -e PYTHONPATH=/workspace/backend qscn:0.3.1 \
+  -e PYTHONPATH=/workspace/backend qscn:0.3.2 \
   python -m unittest discover -s tests -v
 cd frontend && npm test && npm run build && npm audit
 ./scripts/benchmark_demo.sh

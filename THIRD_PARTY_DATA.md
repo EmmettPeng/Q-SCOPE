@@ -6,10 +6,11 @@ labels, or references supplied by third parties.
 
 ## Bundled QSP profiles
 
-The repository contains `QSPdatabase.hmm` and `QSPdatabase.json`. Their exact
-upstream source, construction procedure, license, and redistribution permission
-remain **unconfirmed** for RC1. Checksums and known counts are recorded in
-`databases/provenance.json`.
+The repository contains `QSPdatabase.hmm` and `QSPdatabase.json`. The project
+owner confirmed on 2026-08-10 that these supplied copies may be redistributed
+with QSCN. Their exact upstream source, construction procedure, and upstream
+license still require fuller documentation. Checksums and known counts are
+recorded in `databases/provenance.json`.
 
 ## Bundled KEGG-derived profiles
 
@@ -23,10 +24,12 @@ licensing arrangements for other access and service-provider uses:
 - https://www.kegg.jp/kegg/download/
 - https://www.kegg.jp/kegg/rest/
 
-QSCN RC1 does not claim that redistribution permission has been granted. The
-project owner has chosen to retain these files in the RC distribution while
-the provenance and permission audit remains open. Recipients are responsible
-for determining whether their intended use is permitted.
+The project owner confirmed on 2026-08-10 that the supplied KEGG-derived files
+may be redistributed with QSCN. This project-level confirmation does not change
+their ownership, does not place them under Apache-2.0, and does not establish
+that every downstream use is permitted. The exact upstream version and build
+chain remain pending documentation. Recipients remain responsible for complying
+with applicable KEGG terms for their intended use.
 
 ## Scientific limitations
 

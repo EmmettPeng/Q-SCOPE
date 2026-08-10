@@ -21,6 +21,7 @@ frontend/vite.config.d.ts
 frontend/src/styles 2.css
 qscn-data/
 coverage/
+dist/
 benchmarks/*.zip
 benchmarks/*-summary.json
 databases/*.h3f
