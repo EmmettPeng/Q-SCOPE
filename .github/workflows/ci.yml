@@ -136,4 +136,6 @@ jobs:
           test -f QSCN-v0.4.0-linux/.env.example
           grep -q 'ghcr.io/emmettpeng/qscn@sha256:aaaa' QSCN-v0.4.0-linux/compose.yml
           ! grep -q '__QSCN_IMAGE__' QSCN-v0.4.0-linux/compose.yml
-          ! grep -R -q 'down -v' windows macos QSCN-v0.4.0-linux
+          ! grep -q 'down -v' windows/QSCN-v0.4.0-windows/windows/qscn.ps1
+          ! grep -q 'down -v' macos/QSCN-v0.4.0-macos/macos/qscn.sh
+          ! grep -q 'down -v' QSCN-v0.4.0-linux/linux/QSCN.sh
