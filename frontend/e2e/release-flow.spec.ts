@@ -31,9 +31,9 @@ function storedZip(name: string, content: string): Buffer {
   return Buffer.concat([local, filename, data, central, filename, end])
 }
 
-test('public v0.3.2 workflow: upload, real worker run, reinterpret, views, downloads, delete', async ({ page }) => {
+test('public v0.4.0 workflow: upload, real worker run, reinterpret, views, downloads, delete', async ({ page }) => {
   const archive = join(tmpdir(), `qscn-e2e-${Date.now()}.zip`)
-  const projectName = `v0.3.2 browser E2E ${Date.now()}`
+  const projectName = `v0.4.0 browser E2E ${Date.now()}`
   const databaseName = `TSV browser E2E ${Date.now()}`
   const pathwayTable = join(tmpdir(), `qscn-pathways-${Date.now()}.tsv`)
   writeFileSync(archive, storedZip('tiny-proteome.faa', '>protein_1\nMPEPTIDEWLFQH\n'))
@@ -44,7 +44,7 @@ test('public v0.3.2 workflow: upload, real worker run, reinterpret, views, downl
 
   await page.goto('/')
   await expect(page).toHaveTitle('Quorum Sensing Communication Network Analysis')
-  await expect(page.getByText('QSCN v0.3.2 · For research use only')).toBeVisible()
+  await expect(page.getByText('QSCN v0.4.0 · For research use only')).toBeVisible()
   await page.getByRole('button', { name: 'Import custom database' }).click()
   const templateDownload = page.waitForEvent('download')
   await page.getByRole('link', { name: 'Download TSV template' }).click()

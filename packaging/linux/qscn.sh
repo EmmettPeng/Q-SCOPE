@@ -38,26 +38,26 @@ port() {
 
 doctor() {
   command -v docker >/dev/null 2>&1 || {
-    printf '%s\n' "Docker Desktop is required: https://docs.docker.com/desktop/setup/install/mac-install/" >&2
+    printf '%s\n' "Install Docker Engine and Docker Compose v2: https://docs.docker.com/engine/install/ubuntu/" >&2
     exit 1
   }
   docker compose version >/dev/null 2>&1 || {
-    printf '%s\n' "Docker Compose v2 is required." >&2
+    printf '%s\n' "Docker Compose v2 is required: https://docs.docker.com/compose/install/linux/" >&2
     exit 1
   }
   os_type=$(docker info --format '{{.OSType}}' 2>/dev/null || true)
   [ "$os_type" = "linux" ] || {
-    printf '%s\n' "Docker Desktop is not running with a Linux container engine." >&2
+    printf '%s\n' "The Docker Linux engine is unavailable. Start Docker and ensure this user can access it." >&2
     exit 1
   }
   case "$(uname -m)" in
-    arm64|x86_64) ;;
-    *) printf '%s\n' "Unsupported Mac CPU architecture: $(uname -m)" >&2; exit 1 ;;
+    x86_64|amd64|aarch64|arm64) ;;
+    *) printf '%s\n' "Unsupported Linux CPU architecture: $(uname -m)" >&2; exit 1 ;;
   esac
   free_kb=$(df -Pk "$SCRIPT_DIR" | awk 'NR == 2 {print $4}')
   [ "${free_kb:-0}" -ge 41943040 ] || printf '%s\n' "Warning: less than 40 GB free disk space is available." >&2
-  memory_bytes=$(sysctl -n hw.memsize 2>/dev/null || printf '0')
-  [ "$memory_bytes" -ge 17179869184 ] || printf '%s\n' "Warning: 16 GB host memory is recommended." >&2
+  memory_kb=$(awk '/^MemTotal:/ {print $2; exit}' /proc/meminfo 2>/dev/null || printf '0')
+  [ "${memory_kb:-0}" -ge 16777216 ] || printf '%s\n' "Warning: 16 GB host memory is recommended." >&2
 }
 
 wait_ready() {
@@ -77,21 +77,39 @@ wait_ready() {
   return 1
 }
 
+port_is_listening() {
+  qscn_port="$1"
+  if command -v lsof >/dev/null 2>&1; then
+    lsof -nP -iTCP:"$qscn_port" -sTCP:LISTEN >/dev/null 2>&1
+  elif command -v ss >/dev/null 2>&1; then
+    [ -n "$(ss -ltnH "sport = :$qscn_port" 2>/dev/null)" ]
+  else
+    return 1
+  fi
+}
+
+open_browser() {
+  url="$1"
+  if command -v xdg-open >/dev/null 2>&1; then
+    xdg-open "$url" >/dev/null 2>&1 || true
+  elif command -v gio >/dev/null 2>&1; then
+    gio open "$url" >/dev/null 2>&1 || true
+  else
+    printf '%s\n' "Open $url in a browser."
+  fi
+}
+
 start() {
   doctor
   qscn_port=$(port)
-  if command -v lsof >/dev/null 2>&1 && lsof -nP -iTCP:"$qscn_port" -sTCP:LISTEN >/dev/null 2>&1; then
-    if [ -z "$(compose ps -q app 2>/dev/null || true)" ]; then
-      printf '%s\n' "Port ${qscn_port} is already in use. Change QSCN_PORT in .env." >&2
-      exit 1
-    fi
+  if port_is_listening "$qscn_port" && [ -z "$(compose ps -q app 2>/dev/null || true)" ]; then
+    printf '%s\n' "Port ${qscn_port} is already in use. Change QSCN_PORT in .env." >&2
+    exit 1
   fi
   compose pull
   compose up -d
   wait_ready
-  if [ "${QSCN_NO_BROWSER:-0}" != "1" ]; then
-    open "http://127.0.0.1:${qscn_port}"
-  fi
+  [ "${QSCN_NO_BROWSER:-0}" = "1" ] || open_browser "http://127.0.0.1:${qscn_port}"
 }
 
 backup() {
@@ -106,7 +124,7 @@ backup() {
     sh -c 'tar -czf /backup/qscn-data.tar.gz -C /source .'
   docker run --rm -v qscn_qscn_v03_redis:/source:ro -v "$target:/backup" "$REDIS_IMAGE" \
     sh -c 'tar -czf /backup/qscn-redis.tar.gz -C /source .'
-  (cd "$target" && shasum -a 256 qscn-data.tar.gz qscn-redis.tar.gz > SHA256SUMS)
+  (cd "$target" && sha256sum qscn-data.tar.gz qscn-redis.tar.gz > SHA256SUMS)
   compose up -d
   trap - EXIT INT TERM
   printf '%s\n' "Backup written to $target"
@@ -116,7 +134,7 @@ restore() {
   doctor
   source_dir="${2:-}"
   [ -n "$source_dir" ] && [ -f "$source_dir/qscn-data.tar.gz" ] && [ -f "$source_dir/qscn-redis.tar.gz" ] || {
-    printf '%s\n' "Usage: ./macos/qscn.sh restore /path/to/qscn-backup" >&2
+    printf '%s\n' "Usage: ./linux/QSCN.sh restore /path/to/qscn-backup" >&2
     exit 1
   }
   printf '%s' "This replaces the current QSCN volumes. Type RESTORE to continue: "

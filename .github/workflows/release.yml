@@ -8,7 +8,7 @@ on:
       version:
         description: Release version without the v prefix
         required: true
-        default: '0.3.2'
+        default: '0.4.0'
 
 permissions:
   contents: write
@@ -54,7 +54,7 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=${{ steps.version.outputs.version }}
-            type=raw,value=0.3
+            type=raw,value=0.4
             type=raw,value=latest
       - name: Build and push multi-architecture image
         id: build
@@ -113,4 +113,5 @@ jobs:
           files: |
             dist/releases/QSCN-v${{ steps.version.outputs.version }}-windows.zip
             dist/releases/QSCN-v${{ steps.version.outputs.version }}-macos.zip
+            dist/releases/QSCN-v${{ steps.version.outputs.version }}-linux.tar.gz
             dist/releases/SHA256SUMS

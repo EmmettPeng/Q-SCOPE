@@ -1,6 +1,7 @@
 import json
 import os
 import subprocess
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -12,23 +13,64 @@ class PackagingTest(unittest.TestCase):
     def test_release_compose_uses_remote_image_localhost_and_stable_volumes(self):
         compose = (ROOT / "packaging/compose.yml").read_text(encoding="utf-8")
         self.assertNotIn("build:", compose)
-        self.assertIn("ghcr.io/emmettpeng/qscn:0.3.2", compose)
+        self.assertEqual(compose.count("image: __QSCN_IMAGE__"), 2)
         self.assertIn('127.0.0.1:${QSCN_PORT:-8000}:8000', compose)
-        self.assertEqual(compose.count("${QSCN_IMAGE"), 2)
+        self.assertNotIn("QSCN_IMAGE", (ROOT / "packaging/.env.template").read_text(encoding="utf-8"))
         self.assertIn("name: qscn_qscn_v03_data", compose)
         self.assertIn("name: qscn_qscn_v03_redis", compose)
 
-    def test_launchers_are_safe_and_macos_shell_parses(self):
+    def test_launchers_are_safe_and_shell_launchers_parse(self):
         mac = ROOT / "packaging/macos/qscn.sh"
+        linux = ROOT / "packaging/linux/qscn.sh"
         windows = ROOT / "packaging/windows/qscn.ps1"
-        subprocess.run(["sh", "-n", str(mac)], check=True)
-        self.assertTrue(os.access(mac, os.X_OK))
-        for launcher in (mac, windows):
+        for launcher in (mac, linux):
+            subprocess.run(["sh", "-n", str(launcher)], check=True)
+            self.assertTrue(os.access(launcher, os.X_OK))
+        for launcher in (mac, linux, windows):
             text = launcher.read_text(encoding="utf-8")
             self.assertNotIn("down -v", text)
             self.assertIn("qscn_qscn_v03_data", text)
             self.assertIn("qscn_qscn_v03_redis", text)
             self.assertIn("api/readiness", text)
+            self.assertIn("QSCN_IMAGE", text)
+
+    def test_release_script_builds_three_platform_artifacts(self):
+        script = (ROOT / "scripts/package_release.sh").read_text(encoding="utf-8")
+        self.assertIn("QSCN-v${version}-windows.zip", script)
+        self.assertIn("QSCN-v${version}-macos.zip", script)
+        self.assertIn("QSCN-v${version}-linux.tar.gz", script)
+        self.assertIn('cp "$repo_root/packaging/.env.template" "$target/.env.example"', script)
+
+    def test_unix_launchers_migrate_legacy_image_without_losing_settings(self):
+        for platform in ("macos", "linux"):
+            with self.subTest(platform=platform), tempfile.TemporaryDirectory() as temporary:
+                package = Path(temporary)
+                platform_dir = package / platform
+                platform_dir.mkdir()
+                launcher = platform_dir / "qscn.sh"
+                launcher.write_bytes((ROOT / f"packaging/{platform}/qscn.sh").read_bytes())
+                launcher.chmod(0o755)
+                environment = package / ".env"
+                environment.write_text("QSCN_IMAGE=old-image\nQSCN_PORT=8123\n", encoding="utf-8")
+                fake_bin = package / "bin"
+                fake_bin.mkdir()
+                fake_docker = fake_bin / "docker"
+                fake_docker.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+                fake_docker.chmod(0o755)
+                process_environment = dict(os.environ)
+                process_environment["PATH"] = f"{fake_bin}:/usr/bin:/bin"
+                subprocess.run(
+                    ["sh", str(launcher), "status"],
+                    check=True,
+                    env=process_environment,
+                    capture_output=True,
+                    text=True,
+                )
+                self.assertEqual(environment.read_text(encoding="utf-8"), "QSCN_PORT=8123\n")
+                self.assertEqual(
+                    (package / ".env.v0.3.2.bak").read_text(encoding="utf-8"),
+                    "QSCN_IMAGE=old-image\nQSCN_PORT=8123\n",
+                )
 
     def test_builtin_databases_remain_in_image_and_are_confirmed(self):
         dockerfile = (ROOT / "Dockerfile").read_text(encoding="utf-8")
