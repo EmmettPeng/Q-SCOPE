@@ -2,12 +2,7 @@ name: qscn
 
 services:
   app:
-    image: qscn:0.3.2
-    build:
-      context: .
-      args:
-        QSCN_BUILD_REVISION: ${QSCN_BUILD_REVISION:-unknown}
-        QSCN_BUILD_TIMESTAMP: ${QSCN_BUILD_TIMESTAMP:-unknown}
+    image: ${QSCN_IMAGE:-ghcr.io/emmettpeng/qscn:0.3.2}
     command: ["uvicorn", "qscn.api:app", "--host", "0.0.0.0", "--port", "8000"]
     ports:
       - "127.0.0.1:${QSCN_PORT:-8000}:8000"
@@ -40,12 +35,7 @@ services:
       retries: 12
 
   worker:
-    image: qscn:0.3.2
-    build:
-      context: .
-      args:
-        QSCN_BUILD_REVISION: ${QSCN_BUILD_REVISION:-unknown}
-        QSCN_BUILD_TIMESTAMP: ${QSCN_BUILD_TIMESTAMP:-unknown}
+    image: ${QSCN_IMAGE:-ghcr.io/emmettpeng/qscn:0.3.2}
     command: ["rq", "worker", "qscn", "--url", "redis://redis:6379/0", "--with-scheduler"]
     environment:
       QSCN_DATA_DIR: /data

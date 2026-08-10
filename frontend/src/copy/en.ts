@@ -24,7 +24,7 @@ export const displayRedistributionStatus = (status: string): string => redistrib
 
 export const copy = {
   common: {
-    product: 'QSCN', release: 'QSCN v0.3.1 · For research use only', dismissError: 'Dismiss error',
+    product: 'QSCN', release: 'QSCN v0.3.2 · For research use only', dismissError: 'Dismiss error',
     unknown: '—', notDetected: 'No qualifying evidence detected',
     unexpectedError: 'Something went wrong. Try again. If the problem continues, restart the local QSCN services.',
   },

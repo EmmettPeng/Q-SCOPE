@@ -4,6 +4,21 @@
 
 ## 未发布
 
+- 暂无。
+
+## QSCN v0.3.2 — 2026-08-10
+
+### Windows/macOS 封装与发布
+
+- 新增基于 Docker Desktop 的 Windows x64、Intel Mac 与 Apple Silicon Mac 发布包；两个平台均提供启动、停止、状态、日志、更新、备份与确认恢复入口。
+- 修正 Debian 软件包锁定方式：固定 HMMER 3.4 与 Prodigal 2.6.3，但不再绑定 amd64/arm64 各自不同的构建后缀。
+- 新增 GHCR 发布 Compose，镜像仅绑定 localhost，使用固定的 v0.3 数据卷名称；发布安装包将镜像锁定到多架构 manifest digest，更新不删除用户数据。
+- 新增 GitHub Actions：前后端检查、`linux/amd64`/`linux/arm64` 真实容器构建与测试、PowerShell 语法检查、GHCR 发布、构建证明、漏洞扫描和 GitHub Release 安装包。
+- CI 仅在 `main` push 或 pull request 上运行，避免功能分支 push 与 PR 事件重复执行同一套多架构构建。
+- QSP 与 KEGG QS 两个预设数据库继续随镜像提供；每个目标架构均使用镜像内 HMMER 重新 `hmmpress`，不发布仓库中本机生成的 `.h3*`。
+- 项目负责人于 2026-08-10 确认随 QSCN 分发当前 QSP/KEGG 数据副本；第三方数据仍不属于 Apache-2.0，未确认的上游版本、构建链和适用条款继续如实标注。
+- 本次封装不改变 schema `3`、hit/capability/scope 规则 `1.0`/`2.0`/`1.0`、数据库内容、阈值或分析推断语义，既有 v0.3 run 无需重扫。
+
 ### 自定义数据库导入
 
 - 自定义数据库主入口改为分别选择一个 HMM 库和一个 UTF-8、制表符分隔的 TSV/TXT Pathway 表；导入弹窗收集名称、版本、来源、原生分类和 GA/E-value 阈值，不再要求用户手写 JSON。

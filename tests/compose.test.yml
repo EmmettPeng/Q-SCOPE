@@ -1,0 +1,13 @@
+name: qscn-v032-test
+
+services:
+  app:
+    image: qscn:0.3.2
+  worker:
+    image: qscn:0.3.2
+
+volumes:
+  qscn_v03_data:
+    name: qscn_v032_test_data
+  qscn_v03_redis:
+    name: qscn_v032_test_redis

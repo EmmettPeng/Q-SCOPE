@@ -136,7 +136,7 @@ class V03SchemaTest(unittest.TestCase):
     def test_health_exposes_release_schema_and_build(self):
         result = health()
         self.assertEqual(result["schema_version"], SCHEMA_VERSION)
-        self.assertEqual(result["version"], "0.3.1")
+        self.assertEqual(result["version"], "0.3.2")
 
     def test_restart_marks_only_orphaned_running_jobs_interrupted(self):
         with tempfile.TemporaryDirectory() as temp:

@@ -4,6 +4,11 @@ QSCN builds on FastAPI, Uvicorn, Pydantic, Redis/RQ, React, Cytoscape.js,
 pdf-lib, Vite, HMMER, Prodigal, Python, Node.js, and the Debian/Alpine base
 distributions. Each component remains under its own license.
 
+Windows and macOS release bundles require Docker Desktop but do not redistribute
+it. Users install Docker Desktop separately and are responsible for its current
+subscription terms. The QSCN OCI image and launch scripts are distributed by
+this project through GitHub Container Registry and GitHub Releases.
+
 The direct Python requirements are in `backend/requirements.txt`; the complete
 resolved Python environment is `backend/requirements.lock`. The remaining
 authoritative dependency versions are

@@ -77,7 +77,7 @@ class DatabaseTest(unittest.TestCase):
         }
         for database_id, (hmm_name, metadata_name) in expected.items():
             item = registry[database_id]
-            self.assertEqual(item["redistribution_status"], "unconfirmed")
+            self.assertEqual(item["redistribution_status"], "confirmed")
             self.assertEqual(item["hmm_sha256"], sha256_file(ROOT / "databases" / hmm_name))
             self.assertEqual(item["metadata_sha256"], sha256_file(ROOT / "databases" / metadata_name))
 
