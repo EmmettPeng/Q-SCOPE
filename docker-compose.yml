@@ -76,7 +76,7 @@ services:
       retries: 12
 
   redis:
-    image: redis:7.2.4-alpine@sha256:c8bb255c3559b3e458766db810aa7b3c7af1235b204cfdb304e79ff388fe1a5a
+    image: redis:7.2.15-alpine@sha256:05a97a479bc73de66f087dc05b569010772880f778cc8671fa6b8aadee32e5c6
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
       - qscn_v03_redis:/data

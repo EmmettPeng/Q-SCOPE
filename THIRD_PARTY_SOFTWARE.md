@@ -17,6 +17,6 @@ Redis image digest in `docker-compose.yml`. A release candidate must retain
 the license files included by those distributions and record dependency and
 container vulnerability scan results in its GitHub Actions run and release.
 
-The Compose runtime is pinned to Redis 7.2.4, the last Redis release line
+The Compose runtime is pinned to Redis 7.2.15 from the last Redis release line
 distributed under the BSD 3-Clause license. Do not move this pin to Redis 7.4+
 without a new license and distribution review.

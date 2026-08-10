@@ -10,7 +10,7 @@ $PackageRoot = Split-Path -Parent $PSScriptRoot
 $ComposeFile = Join-Path $PackageRoot 'compose.yml'
 $EnvironmentFile = Join-Path $PackageRoot '.env'
 $EnvironmentExample = Join-Path $PackageRoot '.env.example'
-$RedisImage = 'redis:7.2.4-alpine@sha256:c8bb255c3559b3e458766db810aa7b3c7af1235b204cfdb304e79ff388fe1a5a'
+$RedisImage = 'redis:7.2.15-alpine@sha256:05a97a479bc73de66f087dc05b569010772880f778cc8671fa6b8aadee32e5c6'
 
 function Initialize-QscnEnvironment {
     if (-not (Test-Path $EnvironmentFile)) {

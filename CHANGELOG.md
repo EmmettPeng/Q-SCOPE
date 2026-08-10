@@ -16,6 +16,7 @@
 - 发布包改为携带 `.env.example`，启动器仅在缺失时创建 `.env`。从 v0.3.2 复制的旧 `.env` 会备份并移除失效的 `QSCN_IMAGE` 行，端口及资源设置保持不变。
 - 保留 `qscn_qscn_v03_data` 与 `qscn_qscn_v03_redis`，升级、停止和更新不删除数据卷；schema `3`、数据库、HMM 命中阈值和 hit/capability/scope 规则均未改变，已有分析无需迁移或重扫。
 - 根 README 和平台包新增英文最短安装流程，明确 Windows 不需要额外安装 Ubuntu，Linux 正式宿主矩阵为 Ubuntu 22.04/24.04 LTS amd64/arm64。
+- Redis 运行时从存在已修复 CRITICAL CVE 的 `7.2.4-alpine` 更新并固定到官方 `7.2.15-alpine` 多架构 digest；数据卷、schema 与分析结果不受影响。
 
 ### 验证
 
