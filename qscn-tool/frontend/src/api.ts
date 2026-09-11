@@ -1,6 +1,10 @@
 import { errorMessage } from './copy/en'
+import { demoRequest } from './demo-api'
+
+export const isDemoMode = import.meta.env.VITE_QSCOPE_MODE === 'demo'
 
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
+  if (isDemoMode) return demoRequest<T>(url, init)
   const response = await fetch(url, init)
   if (!response.ok) {
     let message = `${response.status} ${response.statusText}`

@@ -15,9 +15,10 @@ interface AppMastheadProps {
   hasProject: boolean
   hasResults: boolean
   onNavigate: (view: WorkspaceView) => void
+  demo?: boolean
 }
 
-export function AppMasthead({ view, hasProject, hasResults, onNavigate }: AppMastheadProps) {
+export function AppMasthead({ view, hasProject, hasResults, onNavigate, demo = false }: AppMastheadProps) {
   const items: Array<{ id: WorkspaceView; label: string; disabled: boolean }> = [
     { id: 'projects', label: copy.navigation.atlas.projects, disabled: false },
     { id: 'project', label: copy.navigation.atlas.project, disabled: !hasProject },
@@ -33,7 +34,7 @@ export function AppMasthead({ view, hasProject, hasResults, onNavigate }: AppMas
       {items.map((item) => <button type="button" key={item.id} disabled={item.disabled} aria-current={view === item.id ? 'page' : undefined} onClick={() => onNavigate(item.id)}>{item.label}</button>)}
     </nav>
     <div className="atlas-masthead-actions">
-      <span className="atlas-local-state"><i/>{copy.navigation.localOnly}</span>
+      {demo ? <><span className="atlas-demo-state"><i/>Read-only demo · Precomputed PD10 results</span><a className="atlas-demo-link" href="https://github.com/EmmettPeng/Q-SCOPE" target="_blank" rel="noreferrer">GitHub</a><a className="atlas-demo-link" href="https://github.com/EmmettPeng/Q-SCOPE/releases" target="_blank" rel="noreferrer">Local version</a></> : <span className="atlas-local-state"><i/>{copy.navigation.localOnly}</span>}
     </div>
   </header>
 }

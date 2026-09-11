@@ -17,6 +17,8 @@ potential microbial communication links.
 - Restorable PD10 example and database profile/pathway/guidance inspection.
 - Local Docker deployment, stable volumes, multi-architecture images, and
   Windows, macOS, and Linux packages.
+- Read-only GitHub Pages demo built from the existing interface and a versioned,
+  provenance-checked PD10 result snapshot, with no uploads or backend services.
 
 ### Compatibility and scope
 

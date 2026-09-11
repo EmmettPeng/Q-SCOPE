@@ -6,6 +6,14 @@ Current release candidate: `Q-SCOPE v1.0.0`
 Internal version: `1.0.0`
 Application schema: `5`
 
+The frontend now has a separate `VITE_QSCOPE_MODE=demo` build deployed from
+`.github/workflows/pages.yml`. It loads only
+`frontend/public/demo/demo-snapshot.json`; all mutations are rejected by the
+Demo provider and mutating controls are visually disabled. Regenerate the
+snapshot with `scripts/generate_demo_snapshot.py`, validate it with
+`scripts/check_demo_snapshot.py`, and review any biological result diff before
+committing a replacement.
+
 ## Release state
 
 The source tree is prepared as the initial public Q-SCOPE release. Software,
@@ -29,6 +37,8 @@ network inference is prohibited.
   UI, tests, and packages.
 - Run all backend tests inside the release image.
 - Run frontend tests, production build, and high-severity dependency audit.
+- Validate the committed Demo snapshot and build `npm run build:demo`; confirm
+  the Pages artifact contains no inputs, sequences, databases, or local state.
 - Build amd64 and arm64 images; verify tools, profiles, indexes, and readiness.
 - Run the complete browser release flow and PD10 restoration flow.
 - Inspect all platform packages and `SHA256SUMS`.

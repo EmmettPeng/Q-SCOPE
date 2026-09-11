@@ -27,6 +27,13 @@ jobs:
       - name: Build frontend
         run: npm run build
         working-directory: qscn-tool/frontend
+      - name: Validate and build read-only demo
+        run: |
+          python3 ../scripts/check_demo_snapshot.py
+          npm run build:demo
+          test -f dist/demo/demo-snapshot.json
+          ! find dist -type f \( -name '*.zip' -o -name '*.hmm' -o -name '*.sqlite*' -o -name '*.faa' -o -name '*.fna' \) | grep .
+        working-directory: qscn-tool/frontend
       - name: Audit frontend dependencies
         run: npm audit --audit-level=high
         working-directory: qscn-tool/frontend

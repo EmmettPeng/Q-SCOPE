@@ -9,6 +9,12 @@ The application reports evidence before biological inference. Predicted network
 edges are hypotheses, not experimentally validated interactions, and Q-SCOPE is
 not a clinical or diagnostic tool.
 
+## Online demo
+
+The [read-only Q-SCOPE demo](https://emmettpeng.github.io/Q-SCOPE/) uses the
+existing application interface and a precomputed PD10 result snapshot. It does
+not accept uploads, run analyses, store browser data, or require a backend.
+
 ## Install
 
 Download the package for Windows, macOS, or Linux from

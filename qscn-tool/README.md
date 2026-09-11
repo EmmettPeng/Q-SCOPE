@@ -15,6 +15,27 @@ development, test and release commands from this directory. The separate
 `../qscn-research/` directory contains analysis and manuscript artifacts and is
 not part of the Docker build context.
 
+## Read-only GitHub Pages demo
+
+The public demo at <https://emmettpeng.github.io/Q-SCOPE/> renders a
+precomputed PD10 analysis with the production React interface. It has no API,
+upload, analysis worker, persistent storage, cookies, or analytics. Mutating
+controls remain visible but disabled so visitors can see which capabilities are
+available in the local application.
+
+Regenerate and validate its versioned snapshot from this directory:
+
+```bash
+python scripts/generate_demo_snapshot.py
+python scripts/check_demo_snapshot.py
+cd frontend && npm test && npm run build:demo
+```
+
+The generator requires the locked backend dependencies (the release container
+is the recommended runtime). The published artifact contains result JSON only;
+it excludes the PD10 input ZIP, predicted sequences, HMM files, SQLite, Redis,
+and analysis intermediates.
+
 ## Install on Windows, macOS, or Linux
 
 Q-SCOPE is distributed as a local, container-first application. Release bundles
