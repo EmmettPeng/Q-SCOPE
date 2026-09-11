@@ -25,6 +25,8 @@ jobs:
           cache: npm
           cache-dependency-path: qscn-tool/frontend/package-lock.json
       - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
+        with:
+          enablement: true
       - name: Install and test
         run: npm ci && npm test
         working-directory: qscn-tool/frontend
