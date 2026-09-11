@@ -1,6 +1,6 @@
 # Q-SCOPE — v1.0.0
 
-Q-SCOPE (Quorum-Sensing Communication Link Predictor) is a local,
+Q-SCOPE (**Q**uorum-**S**ensing **CO**mmunication Link **P**r**E**dictor) is a local,
 container-first research application for annotating quorum-sensing components
 in microbial genomes or protein sets and reconstructing potential communication
 links.
@@ -64,5 +64,4 @@ resources are third-party data and are not covered by the software license. See
 
 ## Citation
 
-Until the associated manuscript record is finalized, cite the Q-SCOPE release
-version and the source databases used for each analysis.
+The manuscript is under submission and review.
