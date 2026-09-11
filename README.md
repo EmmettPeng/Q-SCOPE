@@ -23,7 +23,6 @@ use the same digest-pinned multi-architecture container image.
 
 Docker Desktop or Docker Engine with Compose v2 is required. Q-SCOPE binds to
 `127.0.0.1:8000` by default and stores projects in local Docker volumes.
-Recommended resources are 4 CPU cores, 16 GB memory, and 40 GB free disk space.
 
 ## Capabilities
 
