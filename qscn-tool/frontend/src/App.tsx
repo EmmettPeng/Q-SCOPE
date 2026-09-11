@@ -1,0 +1,374 @@
+import { useEffect, useMemo, useRef, useState } from 'react'
+import type { CSSProperties } from 'react'
+import { Activity, ArrowRight, ArrowUpDown, Database, Download, FlaskConical, RefreshCw, Search, Settings2, Trash2, UploadCloud, X } from 'lucide-react'
+import { api } from './api'
+import { capabilityCall, filterAndSortCapabilities } from './capabilities'
+import type { CapabilityFilters, CapabilitySort, CapabilitySortKey } from './capabilities'
+import { copy, displayRole, displayRuleStrategy, errorMessage } from './copy/en'
+import { displayEdges, networkMetrics } from './network'
+import type { NetworkViewMode } from './network'
+import { defaultEvidenceFilters, evidenceFiltersActive } from './evidence'
+import type { EvidenceFilters } from './evidence'
+import NetworkView from './NetworkView'
+import type { NetworkViewHandle } from './NetworkView'
+import { AppMasthead, EvidenceWorkspace, NetworkWorkspace, ProjectsHome, ProjectWorkspace } from './EvidenceAtlas'
+import type { EvidenceView, WorkspaceView } from './EvidenceAtlas'
+import { saveBlob } from './pdf'
+import type { AnalysisScope, AnalysisTree, BiologicalAnnotation, BundledExample, Capability, CapabilityRule, DatabaseInfo, ExportStatus, Hit, HmmProfileSummary, InputKind, InterpretationGuidanceEndpoint, InterpretationInfo, NetworkEdge, Project, ResultCollection, Results, RuleRole, RuleStrategy, Run } from './types'
+
+const inputLabels: Record<InputKind, string> = { protein: copy.upload.protein, genome: copy.upload.genome }
+const allScope = (): AnalysisScope => ({ version: '1.0', mode: 'all', requested_values: [], resolved_pathway_ids: [] })
+const emptyCapabilityFilters = (): CapabilityFilters => ({ query: '', sampleId: '', pathwayId: '', role: '', call: '' })
+
+function componentLabel(database: DatabaseInfo, profileId: string): string {
+  const component = database.components?.find((item) => item.profile_id === profileId)
+  if (!component) return profileId
+  return component.display_name === profileId ? profileId : `${component.display_name}(${profileId})`
+}
+
+function resolvedScopePathways(database: DatabaseInfo, scope: AnalysisScope): string[] {
+  if (scope.mode === 'all') return database.pathways.map((pathway) => pathway.pathway_id)
+  if (scope.mode === 'pathways') return database.pathways.filter((pathway) => scope.requested_values.includes(pathway.pathway_id)).map((pathway) => pathway.pathway_id)
+  return database.pathways.filter((pathway) => scope.requested_values.includes(pathway.signal_name)).map((pathway) => pathway.pathway_id)
+}
+
+function EvidenceFilterControls({ filters, onChange, onExport, ruleIds, baseline, shown }: { filters: EvidenceFilters; onChange: (filters: EvidenceFilters) => void; onExport: () => void; ruleIds: string[]; baseline: number; shown: number }) {
+  return <div className="evidence-filter-panel"><div><b>{copy.evidenceFilters.title}</b><small>{copy.evidenceFilters.description}</small></div><label><span>{copy.evidenceFilters.hmmCoverage}</span><input type="range" min="0" max="1" step="0.05" value={filters.minHmmCoverage} onChange={(event) => onChange({ ...filters, minHmmCoverage: Number(event.target.value) })}/><output>{filters.minHmmCoverage.toFixed(2)}</output></label><label><span>{copy.evidenceFilters.sequenceCoverage}</span><input type="range" min="0" max="1" step="0.05" value={filters.minSequenceCoverage} onChange={(event) => onChange({ ...filters, minSequenceCoverage: Number(event.target.value) })}/><output>{filters.minSequenceCoverage.toFixed(2)}</output></label><label className="toggle evidence-partial"><input type="checkbox" checked={filters.includePartial} onChange={(event) => onChange({ ...filters, includePartial: event.target.checked })}/><i/><span>{copy.evidenceFilters.includePartial}</span></label><select aria-label={copy.evidenceFilters.bioRule} value={filters.biologicalRuleId} onChange={(event) => onChange({ ...filters, biologicalRuleId: event.target.value })}><option value="">{copy.evidenceFilters.allBioRules}</option>{ruleIds.map((ruleId) => <option value={ruleId} key={ruleId}>{ruleId}</option>)}</select><button className="secondary" disabled={!evidenceFiltersActive(filters)} onClick={() => onChange(defaultEvidenceFilters())}>{copy.evidenceFilters.clear}</button><button className="secondary" onClick={onExport}><Download size={14}/> {copy.evidenceFilters.export}</button><p>{copy.evidenceFilters.count(shown, baseline)}</p></div>
+}
+
+function ExportButton({ runId, interpretationId, mode }: { runId: string; interpretationId: string; mode: 'analysis' | 'full' }) {
+  const [status, setStatus] = useState<ExportStatus | null>(null)
+  const statusUrl = `/api/runs/${runId}/exports/status?interpretation_id=${encodeURIComponent(interpretationId)}&mode=${mode}`
+  const downloadUrl = `/api/runs/${runId}/exports/download?interpretation_id=${encodeURIComponent(interpretationId)}&mode=${mode}`
+  useEffect(() => { api.get<ExportStatus>(statusUrl).then(setStatus).catch(() => undefined) }, [statusUrl])
+  useEffect(() => {
+    if (!status || !['queued', 'running'].includes(status.status)) return
+    const timer = window.setInterval(() => api.get<ExportStatus>(statusUrl).then(setStatus).catch(() => undefined), 1200)
+    return () => window.clearInterval(timer)
+  }, [status?.status, statusUrl])
+  if (status?.status === 'complete') return <a className="secondary" href={downloadUrl}><Download size={16}/> {mode === 'analysis' ? copy.exports.downloadAnalysis : copy.exports.downloadFull}</a>
+  const start = async () => {
+    try { setStatus(await api.post<ExportStatus>(`/api/runs/${runId}/exports?interpretation_id=${encodeURIComponent(interpretationId)}&mode=${mode}`)) }
+    catch { setStatus({ status: 'failed', mode, progress: 0, completed_files: 0, total_files: 0, download_ready: false }) }
+  }
+  const progress = status && ['queued', 'running'].includes(status.status) ? ` ${Math.round(status.progress * 100)}%` : ''
+  return <button className="secondary" disabled={Boolean(status && ['queued', 'running'].includes(status.status))} onClick={start}>{status && ['queued', 'running'].includes(status.status) ? <RefreshCw className="spin" size={16}/> : <Download size={16}/>} {status?.status === 'failed' ? copy.exports.retry : mode === 'analysis' ? copy.exports.prepareAnalysis : copy.exports.prepareFull}{progress}</button>
+}
+
+function strictRules(database: DatabaseInfo): CapabilityRule[] {
+  return database.pathways.flatMap((pathway) => (['sending', 'receiving'] as RuleRole[])
+    .filter((role) => pathway[`${role}_profiles`].length > 0)
+    .map((role) => ({ pathway_id: pathway.pathway_id, role, strategy: 'all' as const, required_profiles: [] })))
+}
+
+function GuidanceCards({ database, endpoints, version, activeId, onApply }: { database: DatabaseInfo; endpoints: InterpretationGuidanceEndpoint[]; version?: string; activeId?: string | null; onApply: (endpoint: InterpretationGuidanceEndpoint) => void }) {
+  if (!endpoints.length) return null
+  return <div className="guidance-block"><div><b>{copy.rules.guidanceTitle}</b><small>{copy.rules.guidanceDescription(version)}</small></div><div className="guidance-cards">{endpoints.map((endpoint) => <article className={activeId === endpoint.endpoint_id ? 'active' : ''} key={endpoint.endpoint_id}><header><b>{endpoint.name}</b><span>{endpoint.evidence_ids.join(' · ')}</span></header><p>{endpoint.wording}</p><dl><dt>{copy.rules.requiredProfiles}</dt><dd>{endpoint.required_profiles.map((profile) => componentLabel(database, profile)).join(', ')}</dd><dt>{copy.rules.optionalProfiles}</dt><dd>{endpoint.optional_profiles.map((profile) => componentLabel(database, profile)).join(', ') || copy.common.unknown}</dd><dt>{copy.rules.boundary}</dt><dd>{endpoint.boundary}</dd>{endpoint.references.length > 0 && <><dt>{copy.rules.references}</dt><dd>{endpoint.references.map((reference) => <a href={reference} target="_blank" rel="noreferrer" key={reference}>{reference.replace('https://doi.org/', 'doi:')}</a>)}</dd></>}</dl><button className="text-button" onClick={() => onApply(endpoint)}>{copy.rules.applyEndpoint}</button></article>)}</div></div>
+}
+
+function RuleEditor({ database, rules, scope, onChange, onClose }: { database: DatabaseInfo; rules: CapabilityRule[]; scope: AnalysisScope; onChange: (rules: CapabilityRule[]) => void; onClose: () => void }) {
+  const update = (pathwayId: string, role: RuleRole, patch: Partial<CapabilityRule>) => onChange(rules.map((rule) => rule.pathway_id === pathwayId && rule.role === role ? { ...rule, ...patch } : rule))
+  const visible = new Set(resolvedScopePathways(database, scope))
+  return <div className="modal-backdrop"><section className="modal rule-modal" role="dialog" aria-modal="true" aria-labelledby="rules-title">
+    <div className="modal-heading"><div><span className="eyebrow">{copy.rules.eyebrow}</span><h2 id="rules-title">{copy.rules.title}</h2><p>{copy.rules.setupDescription}</p></div><button className="icon-button" onClick={onClose} aria-label={copy.rules.close}><X size={19}/></button></div>
+    <div className="preset-bar"><button className="secondary" onClick={() => onChange(strictRules(database))}>{copy.rules.strict}</button></div>
+    <div className="rule-list">{database.pathways.filter((pathway) => visible.has(pathway.pathway_id)).map((pathway) => <div className="rule-pathway" key={pathway.pathway_id}><div><b>{pathway.name}</b><small>{pathway.signal_name} · {pathway.pathway_id}</small></div>
+      {(['sending', 'receiving'] as RuleRole[]).map((role) => {
+        const profiles = pathway[`${role}_profiles`]
+        if (!profiles.length) return null
+        const rule = rules.find((item) => item.pathway_id === pathway.pathway_id && item.role === role)!
+        const locked = profiles.length === 1
+        const endpoints = database.interpretation_guidance?.endpoints.filter((endpoint) => endpoint.pathway_id === pathway.pathway_id && endpoint.role === role) ?? []
+        return <div className="rule-role" key={role}><span className={`role ${role}`}>{displayRole(role)}</span><select value={rule.strategy} disabled={locked} aria-label={copy.rules.strategyLabel(pathway.name, role)} onChange={(event) => {
+          const strategy = event.target.value as RuleStrategy
+          update(pathway.pathway_id, role, { strategy, required_profiles: strategy === 'required_profiles' ? [profiles[0]] : [], guidance_endpoint_id: null, guidance_version: null })
+        }}><option value="all">{copy.rules.all}</option><option value="required_profiles">{copy.rules.profiles}</option></select>
+          {locked && <small>{copy.rules.locked}</small>}
+          {rule.strategy === 'required_profiles' && <><GuidanceCards database={database} endpoints={endpoints} version={database.interpretation_guidance?.version} activeId={rule.guidance_endpoint_id} onApply={(endpoint) => update(pathway.pathway_id, role, { required_profiles: endpoint.required_profiles, guidance_endpoint_id: endpoint.endpoint_id, guidance_version: database.interpretation_guidance?.version })}/><div className="profile-checks">{profiles.map((profile) => <label key={profile}><input type="checkbox" checked={rule.required_profiles.includes(profile)} onChange={(event) => update(pathway.pathway_id, role, { required_profiles: event.target.checked ? [...rule.required_profiles, profile] : rule.required_profiles.filter((item) => item !== profile), guidance_endpoint_id: null, guidance_version: null })}/><span>{componentLabel(database, profile)}</span></label>)}</div>{!rule.guidance_endpoint_id && endpoints.length > 0 && <small>{copy.rules.customBoundary}</small>}</>}
+          {rule.strategy === 'required_profiles' && !rule.required_profiles.length && <small className="validation">{copy.rules.chooseProfile}</small>}
+        </div>
+      })}</div>)}</div>
+    <div className="modal-actions"><button className="primary" disabled={rules.some((rule) => rule.strategy === 'required_profiles' && !rule.required_profiles.length)} onClick={onClose}>{copy.rules.use}</button></div>
+  </section></div>
+}
+
+function ScopeEditor({ database, scope, onChange, onClose }: { database: DatabaseInfo; scope: AnalysisScope; onChange: (scope: AnalysisScope) => void; onClose: () => void }) {
+  const signals = [...new Set(database.pathways.map((pathway) => pathway.signal_name))]
+  const values = scope.mode === 'pathways' ? database.pathways.map((pathway) => ({ id: pathway.pathway_id, label: pathway.name, detail: pathway.signal_name })) : signals.map((signal) => ({ id: signal, label: signal, detail: copy.scope.pathwayCount(database.pathways.filter((pathway) => pathway.signal_name === signal).length) }))
+  const valid = scope.mode === 'all' || scope.requested_values.length > 0
+  const setMode = (mode: AnalysisScope['mode']) => onChange({ version: '1.0', mode, requested_values: [], resolved_pathway_ids: [] })
+  const toggle = (id: string, checked: boolean) => onChange({ ...scope, requested_values: checked ? [...scope.requested_values, id] : scope.requested_values.filter((value) => value !== id) })
+  return <div className="modal-backdrop"><section className="modal scope-modal" role="dialog" aria-modal="true" aria-labelledby="scope-title">
+    <div className="modal-heading"><div><span className="eyebrow">{copy.scope.eyebrow}</span><h2 id="scope-title">{copy.scope.title}</h2><p>{copy.scope.description}</p></div><button className="icon-button" onClick={onClose} aria-label={copy.scope.close}><X size={19}/></button></div>
+    <div className="segmented scope-modes">{(['all','pathways','signals'] as AnalysisScope['mode'][]).map((mode) => <button className={scope.mode === mode ? 'selected' : ''} onClick={() => setMode(mode)} key={mode}>{copy.scope.modes[mode]}</button>)}</div>
+    {scope.mode !== 'all' && <div className="scope-options">{values.map((value) => <label key={value.id}><input type="checkbox" checked={scope.requested_values.includes(value.id)} onChange={(event) => toggle(value.id, event.target.checked)}/><span><b>{value.label}</b><small>{value.detail}</small></span></label>)}</div>}
+    {!valid && <p className="validation">{copy.scope.chooseOne}</p>}
+    <div className="modal-actions"><button className="primary" disabled={!valid} onClick={onClose}>{copy.scope.use}</button></div>
+  </section></div>
+}
+
+function InterpretationSettings({ database, appliedRules, appliedScope, onApply, onClose }: { database: DatabaseInfo; appliedRules: CapabilityRule[]; appliedScope: AnalysisScope; onApply: (rules: CapabilityRule[], scope: AnalysisScope) => Promise<boolean>; onClose: () => void }) {
+  const [draftRules, setDraftRules] = useState<CapabilityRule[]>(() => structuredClone(appliedRules))
+  const [draftScope, setDraftScope] = useState<AnalysisScope>(() => structuredClone(appliedScope))
+  const [applying, setApplying] = useState(false)
+  const [applyFailed, setApplyFailed] = useState(false)
+  const signals = [...new Set(database.pathways.map((pathway) => pathway.signal_name))]
+  const scopeValues = draftScope.mode === 'pathways' ? database.pathways.map((pathway) => ({ id: pathway.pathway_id, label: pathway.name, detail: pathway.signal_name })) : signals.map((signal) => ({ id: signal, label: signal, detail: copy.scope.pathwayCount(database.pathways.filter((pathway) => pathway.signal_name === signal).length) }))
+  const visible = new Set(resolvedScopePathways(database, draftScope))
+  const scopeValid = draftScope.mode === 'all' || draftScope.requested_values.length > 0
+  const rulesValid = !draftRules.some((rule) => rule.strategy === 'required_profiles' && !rule.required_profiles.length)
+  const settingsKey = (rules: CapabilityRule[], scope: AnalysisScope) => JSON.stringify({ rules, scope: { version: scope.version, mode: scope.mode, requested_values: scope.requested_values } })
+  const dirty = settingsKey(draftRules, draftScope) !== settingsKey(appliedRules, appliedScope)
+  const setMode = (mode: AnalysisScope['mode']) => setDraftScope({ version: '1.0', mode, requested_values: [], resolved_pathway_ids: [] })
+  const toggleScope = (id: string, checked: boolean) => setDraftScope((scope) => ({ ...scope, requested_values: checked ? [...scope.requested_values, id] : scope.requested_values.filter((value) => value !== id) }))
+  const updateRule = (pathwayId: string, role: RuleRole, patch: Partial<CapabilityRule>) => setDraftRules((rules) => rules.map((rule) => rule.pathway_id === pathwayId && rule.role === role ? { ...rule, ...patch } : rule))
+  const apply = async () => { setApplying(true); setApplyFailed(false); try { if (await onApply(draftRules, draftScope)) onClose(); else setApplyFailed(true) } finally { setApplying(false) } }
+  return <div className="modal-backdrop"><section className="modal interpretation-modal" role="dialog" aria-modal="true" aria-labelledby="interpretation-title">
+    <div className="modal-heading"><div><span className="eyebrow">{copy.interpretation.eyebrow}</span><h2 id="interpretation-title">{copy.interpretation.title}</h2><p>{copy.interpretation.description}</p></div><button className="icon-button" onClick={onClose} disabled={applying} aria-label={copy.interpretation.close}><X size={19}/></button></div>
+    <section className="settings-section"><h3>{copy.scope.title}</h3><p>{copy.scope.description}</p><div className="segmented scope-modes">{(['all','pathways','signals'] as AnalysisScope['mode'][]).map((mode) => <button className={draftScope.mode === mode ? 'selected' : ''} onClick={() => setMode(mode)} key={mode}>{copy.scope.modes[mode]}</button>)}</div>
+      {draftScope.mode !== 'all' && <div className="scope-options">{scopeValues.map((value) => <label key={value.id}><input type="checkbox" checked={draftScope.requested_values.includes(value.id)} onChange={(event) => toggleScope(value.id, event.target.checked)}/><span><b>{value.label}</b><small>{value.detail}</small></span></label>)}</div>}{!scopeValid && <p className="validation">{copy.scope.chooseOne}</p>}
+    </section>
+    <section className="settings-section"><div className="settings-section-heading"><div><h3>{copy.rules.title}</h3><p>{copy.rules.description}</p></div><div className="preset-bar"><button className="secondary" onClick={() => setDraftRules(strictRules(database))}>{copy.rules.strict}</button></div></div>
+      <div className="rule-list">{database.pathways.filter((pathway) => visible.has(pathway.pathway_id)).map((pathway) => <div className="rule-pathway" key={pathway.pathway_id}><div><b>{pathway.name}</b><small>{pathway.signal_name} · {pathway.pathway_id}</small></div>{(['sending', 'receiving'] as RuleRole[]).map((role) => {
+        const profiles = pathway[`${role}_profiles`]; if (!profiles.length) return null
+        const rule = draftRules.find((item) => item.pathway_id === pathway.pathway_id && item.role === role)!
+        const locked = profiles.length === 1
+        const endpoints = database.interpretation_guidance?.endpoints.filter((endpoint) => endpoint.pathway_id === pathway.pathway_id && endpoint.role === role) ?? []
+        return <div className="rule-role" key={role}><span className={`role ${role}`}>{displayRole(role)}</span><select value={rule.strategy} disabled={locked} aria-label={copy.rules.strategyLabel(pathway.name, role)} onChange={(event) => { const strategy = event.target.value as RuleStrategy; updateRule(pathway.pathway_id, role, { strategy, required_profiles: strategy === 'required_profiles' ? [profiles[0]] : [], guidance_endpoint_id: null, guidance_version: null }) }}><option value="all">{copy.rules.all}</option><option value="required_profiles">{copy.rules.profiles}</option></select>{locked && <small>{copy.rules.locked}</small>}{rule.strategy === 'required_profiles' && <><GuidanceCards database={database} endpoints={endpoints} version={database.interpretation_guidance?.version} activeId={rule.guidance_endpoint_id} onApply={(endpoint) => updateRule(pathway.pathway_id, role, { required_profiles: endpoint.required_profiles, guidance_endpoint_id: endpoint.endpoint_id, guidance_version: database.interpretation_guidance?.version })}/><div className="profile-checks">{profiles.map((profile) => <label key={profile}><input type="checkbox" checked={rule.required_profiles.includes(profile)} onChange={(event) => updateRule(pathway.pathway_id, role, { required_profiles: event.target.checked ? [...rule.required_profiles, profile] : rule.required_profiles.filter((item) => item !== profile), guidance_endpoint_id: null, guidance_version: null })}/><span>{componentLabel(database, profile)}</span></label>)}</div>{!rule.guidance_endpoint_id && endpoints.length > 0 && <small>{copy.rules.customBoundary}</small>}</>}{rule.strategy === 'required_profiles' && !rule.required_profiles.length && <small className="validation">{copy.rules.chooseProfile}</small>}</div>
+      })}</div>)}</div>
+    </section>
+    {applyFailed && <p className="validation">{copy.interpretation.applyFailed}</p>}<div className="modal-actions"><button className="secondary" disabled={applying} onClick={onClose}>{copy.interpretation.cancel}</button><button className="primary" disabled={applying || !dirty || !scopeValid || !rulesValid} onClick={apply}>{applying && <RefreshCw className="spin" size={15}/>} {copy.capabilities.apply}</button></div>
+  </section></div>
+}
+
+function RunProgress({ run, sampleNames }: { run: Run; sampleNames: Map<string, string> }) {
+  const detail = run.progress_detail
+  const phase = detail?.phase ?? run.stage.split(':', 1)[0]
+  const labels: Record<string, string> = { queued: copy.progress.queued, preparing: copy.progress.preparing, predicting: copy.progress.predicting, reusing_predictions: copy.progress.reusing_predictions, scanning: copy.progress.scanning, interpreting: copy.progress.interpreting, complete: copy.progress.complete, cancelled: copy.progress.cancelled }
+  const currentSampleIndex = detail?.current_sample_id ? [...sampleNames.keys()].indexOf(detail.current_sample_id) : -1
+  const currentSampleNumber = detail
+    ? currentSampleIndex >= 0 ? currentSampleIndex + 1 : Math.min(detail.completed_samples + 1, detail.total_samples)
+    : 0
+  const sample = detail?.current_sample_id
+    ? ` · ${copy.progress.sample(currentSampleNumber, detail.total_samples, sampleNames.get(detail.current_sample_id) ?? detail.current_sample_id)}`
+    : ''
+  const phases = run.input_kind === 'genome' ? ['preparing', 'predicting', 'scanning', 'interpreting'] : ['preparing', 'scanning', 'interpreting']
+  const activeIndex = phase === 'complete' ? phases.length : phases.indexOf(phase === 'reusing_predictions' ? 'predicting' : phase)
+  return <div className="run-status"><div><span>{labels[phase] ?? phase}{sample}</span><b>{Math.round(run.progress * 100)}%</b></div><div className="progress"><i style={{ width: `${run.progress * 100}%` }}/></div><div className="phase-list">{phases.map((item, index) => <span className={index < activeIndex ? 'done' : index === activeIndex ? 'active' : ''} key={item}>{labels[item]}</span>)}</div></div>
+}
+
+function AnalysisHistory({ tree, activeRunId, activeInterpretationId, onOpen, onRename }: { tree: AnalysisTree | null; activeRunId?: string; activeInterpretationId?: string; onOpen: (run: Run, interpretation: InterpretationInfo) => void; onRename: (run: Run, interpretation: InterpretationInfo) => void }) {
+  return <article className="panel analysis-history"><span className="eyebrow">{copy.history.eyebrow}</span><h2>{copy.history.title}</h2>{!tree?.databases.length ? <p>{copy.history.empty}</p> : <div className="analysis-tree">{tree.databases.map((database) => <section key={database.database_version_id}><header><Database size={16}/><span><b>{database.name}</b><small>{database.version}</small></span></header>{database.runs.map((run) => <div className={`analysis-run ${run.id === activeRunId ? 'active' : ''}`} key={run.id}><div><FlaskConical size={14}/><span><b>{copy.history.run(run.created_at, run.id)}</b><small>{run.status} · {copy.history.interpretationCount(run.interpretations?.length ?? 0)}</small></span></div><div className="interpretation-list">{run.interpretations?.map((interpretation) => <div className={interpretation.id === activeInterpretationId ? 'active' : ''} key={interpretation.id}><button title={copy.history.open} onClick={() => onOpen(run, interpretation)}><b>{interpretation.display_name}</b><small>{new Date(interpretation.created_at).toLocaleString()}</small></button><button className="icon-button" title={copy.history.rename} aria-label={copy.history.rename} onClick={() => onRename(run, interpretation)}>✎</button></div>)}</div></div>)}</section>)}</div>}</article>
+}
+
+function DatabaseGuide({ onClose, onSubmit, busy }: { onClose: () => void; onSubmit: (form: FormData) => Promise<string | undefined>; busy: boolean }) {
+  const [name, setName] = useState(''); const [version, setVersion] = useState('1.0'); const [source, setSource] = useState(''); const [classification, setClassification] = useState('')
+  const [thresholdType, setThresholdType] = useState<'ga' | 'evalue'>('evalue'); const [fullEvalue, setFullEvalue] = useState('1e-5'); const [domainIEvalue, setDomainIEvalue] = useState('1e-5')
+  const [hmmFile, setHmmFile] = useState<File | null>(null); const [pathwayFile, setPathwayFile] = useState<File | null>(null); const [componentFile, setComponentFile] = useState<File | null>(null); const [guidanceFile, setGuidanceFile] = useState<File | null>(null); const [failure, setFailure] = useState('')
+  const valid = Boolean(name.trim() && version.trim() && hmmFile && pathwayFile && (thresholdType === 'ga' || (Number(fullEvalue) > 0 && Number(domainIEvalue) > 0)))
+  async function submit() {
+    if (!valid || !hmmFile || !pathwayFile) return setFailure(copy.databaseGuide.required)
+    const form = new FormData(); form.append('hmm_file', hmmFile); form.append('pathway_file', pathwayFile); if (componentFile) form.append('component_file', componentFile); if (guidanceFile) form.append('guidance_file', guidanceFile); form.append('name', name.trim()); form.append('version', version.trim()); form.append('source', source.trim()); form.append('classification_scheme', classification.trim()); form.append('threshold_type', thresholdType)
+    if (thresholdType === 'evalue') { form.append('default_full_evalue', fullEvalue); form.append('default_domain_i_evalue', domainIEvalue) }
+    setFailure(''); const error = await onSubmit(form); if (error) setFailure(error); else onClose()
+  }
+  return <div className="modal-backdrop"><section className="modal guide-modal" role="dialog" aria-modal="true" aria-labelledby="database-guide-title"><div className="modal-heading"><div><span className="eyebrow">{copy.databaseGuide.eyebrow}</span><h2 id="database-guide-title">{copy.databaseGuide.title}</h2><p>{copy.databaseGuide.description}</p></div><button className="icon-button" disabled={busy} onClick={onClose} aria-label={copy.databaseGuide.close}><X size={19}/></button></div><div className="database-form-grid"><label className="field"><span>{copy.databaseGuide.name}</span><input value={name} onChange={(event) => setName(event.target.value)}/></label><label className="field"><span>{copy.databaseGuide.version}</span><input value={version} onChange={(event) => setVersion(event.target.value)}/></label><label className="field"><span>{copy.databaseGuide.source}</span><input value={source} onChange={(event) => setSource(event.target.value)} placeholder="User provided"/></label><label className="field"><span>{copy.databaseGuide.classification}</span><input value={classification} onChange={(event) => setClassification(event.target.value)} placeholder="User-defined classification"/></label><label className="field"><span>{copy.databaseGuide.threshold}</span><select value={thresholdType} onChange={(event) => setThresholdType(event.target.value as 'ga' | 'evalue')}><option value="evalue">{copy.databaseGuide.evalue}</option><option value="ga">{copy.databaseGuide.ga}</option></select></label>{thresholdType === 'evalue' && <><label className="field"><span>{copy.databaseGuide.fullEvalue}</span><input value={fullEvalue} onChange={(event) => setFullEvalue(event.target.value)}/></label><label className="field"><span>{copy.databaseGuide.domainIEvalue}</span><input value={domainIEvalue} onChange={(event) => setDomainIEvalue(event.target.value)}/></label></>}</div><div className="database-file-grid"><label className="file-picker"><UploadCloud size={18}/><span><b>{copy.databaseGuide.hmmFile}</b><small>{hmmFile?.name || copy.databaseGuide.chooseHmm}</small></span><input type="file" accept=".hmm" onChange={(event) => setHmmFile(event.target.files?.[0] ?? null)}/></label><label className="file-picker"><UploadCloud size={18}/><span><b>{copy.databaseGuide.pathwayFile}</b><small>{pathwayFile?.name || copy.databaseGuide.chooseTable}</small></span><input type="file" accept=".tsv,.txt" onChange={(event) => setPathwayFile(event.target.files?.[0] ?? null)}/></label><label className="file-picker"><UploadCloud size={18}/><span><b>{copy.databaseGuide.componentFile}</b><small>{componentFile?.name || copy.databaseGuide.chooseComponents}</small></span><input type="file" accept=".tsv,.txt" onChange={(event) => setComponentFile(event.target.files?.[0] ?? null)}/></label><label className="file-picker"><UploadCloud size={18}/><span><b>{copy.databaseGuide.guidanceFile}</b><small>{guidanceFile?.name || copy.databaseGuide.chooseGuidance}</small></span><input type="file" accept=".tsv,.txt" onChange={(event) => setGuidanceFile(event.target.files?.[0] ?? null)}/></label></div><div className="database-format"><div><h3>{copy.databaseGuide.format}</h3><ul>{copy.databaseGuide.notes.map((note) => <li key={note}>{note}</li>)}</ul></div><div className="template-links"><a className="secondary" href="/api/databases/template"><Download size={15}/> {copy.databaseGuide.template}</a><a className="secondary" href="/api/databases/component-template"><Download size={15}/> {copy.databaseGuide.componentTemplate}</a><a className="secondary" href="/api/databases/guidance-template"><Download size={15}/> {copy.databaseGuide.guidanceTemplate}</a></div></div>{failure && <p className="validation import-validation">{failure}</p>}<div className="modal-actions"><button className="secondary" disabled={busy} onClick={onClose}>{copy.databaseGuide.close}</button><button className="primary" disabled={busy || !valid} onClick={submit}>{busy ? <RefreshCw className="spin" size={16}/> : <UploadCloud size={16}/>} {busy ? copy.databaseGuide.importing : copy.databaseGuide.choose}</button></div></section></div>
+}
+
+function DatabaseDetails({ database, onClose }: { database: DatabaseInfo; onClose: () => void }) {
+  const [tab, setTab] = useState<'overview' | 'profiles' | 'pathways' | 'guidance'>('overview')
+  const [query, setQuery] = useState(''); const [offset, setOffset] = useState(0)
+  const [page, setPage] = useState<ResultCollection<HmmProfileSummary> | null>(null)
+  useEffect(() => {
+    if (tab !== 'profiles') return
+    const timer = window.setTimeout(() => api.get<ResultCollection<HmmProfileSummary>>(`/api/databases/${encodeURIComponent(database.version_id)}/profiles?query=${encodeURIComponent(query)}&offset=${offset}&limit=50`).then(setPage), 120)
+    return () => window.clearTimeout(timer)
+  }, [database.version_id, tab, query, offset])
+  return <div className="modal-backdrop"><section className="modal database-detail-modal" role="dialog" aria-modal="true" aria-labelledby="database-detail-title">
+    <div className="modal-heading"><div><span className="eyebrow">Database definition</span><h2 id="database-detail-title">{database.name}</h2><p>{database.version} · {database.classification_scheme}</p></div><button className="icon-button" onClick={onClose} aria-label="Close database details"><X size={19}/></button></div>
+    <nav className="database-detail-tabs">{(['overview','profiles','pathways','guidance'] as const).map((item) => <button className={tab === item ? 'active' : ''} onClick={() => setTab(item)} key={item}>{item === 'profiles' ? 'HMM profiles' : item === 'pathways' ? 'Pathway definitions' : item === 'guidance' ? 'Interpretation guidance' : 'Overview'}</button>)}</nav>
+    {tab === 'overview' && <div className="database-overview-grid"><dl><dt>Source</dt><dd>{database.source || 'N/A'}</dd><dt>Version</dt><dd>{database.version}</dd><dt>Threshold policy</dt><dd>{database.threshold_type === 'ga' ? 'Curated profile-specific GA' : `Full/domain E-value ≤ ${database.threshold_policy.default_full_evalue ?? database.default_evalue ?? 'N/A'}`}</dd><dt>Profiles / pathways</dt><dd>{database.profile_count} / {database.pathway_count}</dd><dt>Checksum</dt><dd className="mono">{database.checksum}</dd></dl><dl><dt>Source version</dt><dd>{database.provenance.source_version || 'N/A'}</dd><dt>Build date</dt><dd>{database.provenance.build_date || 'N/A'}</dd><dt>Build method</dt><dd>{database.provenance.build_method || 'N/A'}</dd><dt>License</dt><dd>{database.provenance.license || 'N/A'}</dd><dt>Redistribution</dt><dd>{database.redistribution_status}</dd></dl></div>}
+    {tab === 'profiles' && <div className="database-profile-browser"><label className="search"><Search size={15}/><input value={query} placeholder="Search profile or protein name" onChange={(event) => { setQuery(event.target.value); setOffset(0) }}/></label>{!page ? <p>Loading profiles…</p> : <><div className="database-profile-list">{page.items.map((item) => <article key={item.profile_id}><header><b>{item.display_label}</b><code>{item.profile_id}</code></header><p>Length: {item.model_length ?? 'N/A'} · GA sequence/domain: {item.ga_sequence ?? 'N/A'} / {item.ga_domain ?? 'N/A'}</p><small>{item.pathway_roles.length ? item.pathway_roles.map((usage) => `${usage.pathway_name} · ${displayRole(usage.role)}`).join(' · ') : 'Not referenced by a pathway definition'}</small></article>)}</div><div className="pager"><button className="secondary" disabled={!offset} onClick={() => setOffset(Math.max(0, offset - 50))}>Previous</button><span>{page.total ? `${offset + 1}–${Math.min(offset + 50, page.total)} of ${page.total}` : 'No matching profiles'}</span><button className="secondary" disabled={offset + 50 >= page.total} onClick={() => setOffset(offset + 50)}>Next</button></div></>}</div>}
+    {tab === 'pathways' && <div className="database-pathway-list">{database.pathways.length ? database.pathways.map((pathway) => <article key={pathway.pathway_id}><header><div><b>{pathway.name}</b><small>{pathway.pathway_id} · {pathway.signal_name}</small></div></header><dl><dt>Sending</dt><dd>{pathway.sending_profiles.map((id) => componentLabel(database, id)).join(', ') || 'N/A'}</dd><dt>Receiving</dt><dd>{pathway.receiving_profiles.map((id) => componentLabel(database, id)).join(', ') || 'N/A'}</dd><dt>References</dt><dd>{pathway.references.length ? pathway.references.map((reference) => <a href={reference} target="_blank" rel="noreferrer" key={reference}>{reference}</a>) : 'N/A'}</dd></dl></article>) : <p className="atlas-empty-state">No pathway definitions supplied.</p>}</div>}
+    {tab === 'guidance' && <div className="database-guidance-list">{database.interpretation_guidance?.endpoints.length ? <><p>Guidance version {database.interpretation_guidance.version}</p>{database.interpretation_guidance.endpoints.map((endpoint) => <article key={endpoint.endpoint_id}><header><b>{endpoint.name}</b><span>{endpoint.pathway_id} · {displayRole(endpoint.role)}</span></header><p>{endpoint.wording}</p><dl><dt>Required</dt><dd>{endpoint.required_profiles.map((id) => componentLabel(database, id)).join(', ')}</dd><dt>Optional</dt><dd>{endpoint.optional_profiles.map((id) => componentLabel(database, id)).join(', ') || 'N/A'}</dd><dt>Boundary</dt><dd>{endpoint.boundary}</dd><dt>Evidence</dt><dd>{endpoint.evidence_ids.join(', ') || 'N/A'}</dd></dl></article>)}</> : <p className="atlas-empty-state">No interpretation guidance supplied for this database.</p>}</div>}
+  </section></div>
+}
+
+export default function App() {
+  const [projects, setProjects] = useState<Project[]>([]); const [databases, setDatabases] = useState<DatabaseInfo[]>([])
+  const [examples, setExamples] = useState<BundledExample[]>([])
+  const [activeProject, setActiveProject] = useState<Project | null>(null); const [activeRun, setActiveRun] = useState<Run | null>(null); const [results, setResults] = useState<Results | null>(null)
+  const [analysisTree, setAnalysisTree] = useState<AnalysisTree | null>(null)
+  const [workspaceView, setWorkspaceView] = useState<WorkspaceView>('projects'); const [evidenceView, setEvidenceView] = useState<EvidenceView>('capabilities'); const [busy, setBusy] = useState(false); const [error, setError] = useState(''); const [capabilityFilters, setCapabilityFilters] = useState<CapabilityFilters>(emptyCapabilityFilters); const [capabilitySort, setCapabilitySort] = useState<CapabilitySort>({ key: 'sample', direction: 'asc' }); const [showSelf, setShowSelf] = useState(true); const [networkMode, setNetworkMode] = useState<NetworkViewMode>('minimal')
+  const [projectName, setProjectName] = useState(''); const [archiveFile, setArchiveFile] = useState<File | null>(null); const [inputKind, setInputKind] = useState<InputKind>('protein')
+  const [databaseId, setDatabaseId] = useState(''); const [rules, setRules] = useState<CapabilityRule[]>([]); const [analysisScope, setAnalysisScope] = useState<AnalysisScope>(allScope()); const [fullEvalue, setFullEvalue] = useState('1e-5'); const [domainIEvalue, setDomainIEvalue] = useState('1e-5'); const [showRules, setShowRules] = useState(false); const [showScope, setShowScope] = useState(false); const [showInterpretation, setShowInterpretation] = useState(false); const [showDatabaseGuide, setShowDatabaseGuide] = useState(false); const [databaseDetails, setDatabaseDetails] = useState<DatabaseInfo | null>(null); const [showAllHits, setShowAllHits] = useState(false)
+  const [evidenceFilters, setEvidenceFilters] = useState<EvidenceFilters>(defaultEvidenceFilters)
+  const [capabilityPage, setCapabilityPage] = useState(0); const [hitOffset, setHitOffset] = useState(0); const [hitTotal, setHitTotal] = useState(0); const [hitBaseline, setHitBaseline] = useState(0); const [hitRecordIds, setHitRecordIds] = useState<string[]>([]); const [loadingResults, setLoadingResults] = useState(false)
+  const projectNameRef = useRef<HTMLInputElement>(null); const archiveRef = useRef<HTMLInputElement>(null); const networkRef = useRef<NetworkViewHandle>(null)
+  const selectedDatabase = databases.find((item) => item.version_id === databaseId)
+  const activeSampleNames = useMemo(() => new Map(activeProject?.samples.map((sample) => [sample.sample_id, sample.display_name]) ?? []), [activeProject])
+  const sampleNames = useMemo(() => new Map(results?.samples.map((sample) => [sample.sample_id, sample.display_name]) ?? []), [results])
+  const biologicalRuleIds = useMemo(() => results?.biological_rule_ids ?? [...new Set((results?.biological_annotations ?? []).map((item) => item.rule_id))].sort(), [results])
+  const evidenceCapabilities = results?.capabilities ?? []
+  const filteredCapabilities = useMemo(() => filterAndSortCapabilities(evidenceCapabilities, sampleNames, capabilityFilters, capabilitySort), [evidenceCapabilities, sampleNames, capabilityFilters, capabilitySort])
+  const pagedCapabilities = useMemo(() => filteredCapabilities.slice(capabilityPage * 100, capabilityPage * 100 + 100), [filteredCapabilities, capabilityPage])
+  const evidenceEdges = results?.network.edges ?? []
+  const visibleEdges = useMemo(() => evidenceEdges.filter((edge) => showSelf || !edge.self_communication), [evidenceEdges, showSelf])
+  const renderedEdges = useMemo(() => displayEdges(visibleEdges, networkMode), [visibleEdges, networkMode])
+  const visibleNetwork = useMemo(() => results ? networkMetrics(results.network.nodes, visibleEdges) : null, [results, visibleEdges])
+  const scopedProfiles = useMemo(() => {
+    if (!selectedDatabase) return new Set<string>()
+    const selected = new Set(resolvedScopePathways(selectedDatabase, analysisScope))
+    return new Set(selectedDatabase.pathways.filter((pathway) => selected.has(pathway.pathway_id)).flatMap((pathway) => [...pathway.sending_profiles, ...pathway.receiving_profiles]))
+  }, [selectedDatabase, analysisScope])
+  const visibleHits = results?.hits ?? []
+  const savedInterpretationCount = analysisTree?.databases.reduce((databaseTotal, database) => databaseTotal + database.runs.reduce((runTotal, run) => runTotal + (run.interpretations?.length ?? 0), 0), 0) ?? 0
+
+  function exportEvidenceView(view: 'capabilities' | 'network' | 'hits', recordIds: string[], baselineCount: number) {
+    if (!results) return
+    const payload = {
+      evidence_view_version: '1.0', evidence_rule_version: results.evidence_rule_version ?? 'unknown',
+      run_id: results.run_id, interpretation_id: results.interpretation_id, view,
+      filters: evidenceFilters, baseline_count: baselineCount, shown_count: recordIds.length,
+      record_ids: recordIds,
+    }
+    saveBlob(new Blob([`${JSON.stringify(payload, null, 2)}\n`], { type: 'application/json' }), `qscn-${view}-evidence-view.json`)
+  }
+
+  function evidenceQuery(interpretationId: string): URLSearchParams {
+    return new URLSearchParams({
+      interpretation_id: interpretationId,
+      min_hmm_coverage: String(evidenceFilters.minHmmCoverage),
+      min_sequence_coverage: String(evidenceFilters.minSequenceCoverage),
+      include_partial: String(evidenceFilters.includePartial),
+      biological_rule_id: evidenceFilters.biologicalRuleId,
+    })
+  }
+
+  useEffect(() => { setCapabilityPage(0) }, [capabilityFilters, capabilitySort, evidenceFilters, results?.interpretation_id])
+  useEffect(() => { setHitOffset(0) }, [evidenceFilters, showAllHits, analysisScope, results?.interpretation_id])
+  useEffect(() => {
+    if (!results || workspaceView !== 'evidence' || evidenceView !== 'capabilities') return
+    const interpretationId = results.interpretation_id; const params = evidenceQuery(interpretationId)
+    setLoadingResults(true)
+    api.get<ResultCollection<Capability>>(`/api/runs/${results.run_id}/results/capabilities?${params}`).then((page) => {
+      setResults((current) => current?.interpretation_id === interpretationId ? { ...current, capabilities: page.items } : current)
+    }).catch((caught) => setError(caught.message)).finally(() => setLoadingResults(false))
+  }, [workspaceView, evidenceView, results?.interpretation_id, evidenceFilters])
+  useEffect(() => {
+    if (!results || workspaceView !== 'network') return
+    const interpretationId = results.interpretation_id; const params = evidenceQuery(interpretationId)
+    setLoadingResults(true)
+    api.get<ResultCollection<NetworkEdge>>(`/api/runs/${results.run_id}/results/network-edges?${params}`).then((page) => {
+      setResults((current) => current?.interpretation_id === interpretationId ? { ...current, network: { ...current.network, edges: page.items } } : current)
+    }).catch((caught) => setError(caught.message)).finally(() => setLoadingResults(false))
+  }, [workspaceView, results?.interpretation_id, evidenceFilters])
+  useEffect(() => {
+    if (!results || results.biological_annotations.length) return
+    const interpretationId = results.interpretation_id
+    api.get<ResultCollection<BiologicalAnnotation>>(`/api/runs/${results.run_id}/results/annotations?interpretation_id=${encodeURIComponent(interpretationId)}`).then((page) => {
+      setResults((current) => current?.interpretation_id === interpretationId ? { ...current, biological_annotations: page.items } : current)
+    }).catch((caught) => setError(caught.message))
+  }, [results?.interpretation_id])
+  useEffect(() => {
+    if (!results || workspaceView !== 'evidence' || evidenceView !== 'hits') return
+    const interpretationId = results.interpretation_id; const params = evidenceQuery(interpretationId)
+    params.set('offset', String(hitOffset)); params.set('limit', '500')
+    if (!showAllHits && analysisScope.mode !== 'all') scopedProfiles.forEach((profile) => params.append('profile_id', profile))
+    setLoadingResults(true)
+    api.get<ResultCollection<Hit>>(`/api/runs/${results.run_id}/results/hits?${params}`).then((page) => {
+      setHitTotal(page.total); setHitBaseline(page.baseline); setHitRecordIds(page.record_ids ?? [])
+      setResults((current) => current?.interpretation_id === interpretationId ? { ...current, hits: page.items } : current)
+    }).catch((caught) => setError(caught.message)).finally(() => setLoadingResults(false))
+  }, [workspaceView, evidenceView, results?.interpretation_id, evidenceFilters, showAllHits, analysisScope, scopedProfiles, hitOffset])
+
+  const refreshTree = async (projectId: string) => setAnalysisTree(await api.get<AnalysisTree>(`/api/projects/${projectId}/analysis-tree`))
+  const refresh = async () => { const [nextProjects, nextDatabases, nextExamples] = await Promise.all([api.get<Project[]>('/api/projects'), api.get<DatabaseInfo[]>('/api/databases'), api.get<BundledExample[]>('/api/examples')]); setProjects(nextProjects); setDatabases(nextDatabases); setExamples(nextExamples); setDatabaseId((current) => current || nextDatabases[0]?.version_id || ''); if (activeProject) setActiveProject(nextProjects.find((project) => project.id === activeProject.id) ?? null) }
+  useEffect(() => { refresh().catch((caught) => setError(caught.message)) }, [])
+  useEffect(() => { setEvidenceFilters(defaultEvidenceFilters()) }, [results?.interpretation_id])
+  useEffect(() => { if (selectedDatabase && !rules.length) setRules(strictRules(selectedDatabase)) }, [selectedDatabase?.version_id])
+  useEffect(() => { if (!activeRun || !['queued', 'running'].includes(activeRun.status)) return; const timer = window.setInterval(async () => { try { const run = await api.get<Run>(`/api/runs/${activeRun.id}`); setActiveRun(run); if (activeProject) await refreshTree(activeProject.id); if (run.status === 'complete') { const next = await api.get<Results>(`/api/runs/${run.id}/results?summary=true`); setResults(next); setRules(next.capability_rules); setAnalysisScope(next.analysis_scope ?? allScope()); setShowAllHits(false); setEvidenceView('capabilities'); setWorkspaceView('evidence') } } catch (caught) { setError((caught as Error).message) } }, 1800); return () => window.clearInterval(timer) }, [activeRun?.id, activeRun?.status, activeProject?.id])
+
+  async function uploadProject() { if (!archiveFile) return setError(copy.upload.chooseFirst); setBusy(true); setError(''); try { const form = new FormData(); form.append('archive', archiveFile); const project = await api.post<Project>(`/api/projects?name=${encodeURIComponent(projectName || archiveFile.name.replace(/\.zip$/i, ''))}`, form); const ready = await api.post<Project>(`/api/projects/${project.id}/preflight`, { input_kind: inputKind }); await refresh(); setActiveProject(ready); setResults(null); setActiveRun(null); setAnalysisTree({ project_id: ready.id, databases: [] }); setWorkspaceView('project') } catch (caught) { setError((caught as Error).message) } finally { setBusy(false) } }
+  async function startRun() { if (!activeProject || !databaseId) return; setBusy(true); setError(''); try { const body: Record<string, unknown> = { input_kind: activeProject.input_kind, database_version_id: databaseId, capability_rules: rules, analysis_scope: analysisScope }; if (selectedDatabase?.threshold_type === 'evalue') body.hit_thresholds_override = { full_evalue_max: Number(fullEvalue), domain_i_evalue_max: Number(domainIEvalue) }; const run = await api.post<Run>(`/api/projects/${activeProject.id}/runs`, body); setActiveRun(run); setResults(null); await refreshTree(activeProject.id) } catch (caught) { setError((caught as Error).message) } finally { setBusy(false) } }
+  async function openSavedInterpretation(runSummary: Run, interpretation: InterpretationInfo) { setError(''); try { const run = await api.get<Run>(`/api/runs/${runSummary.id}`); const next = await api.get<Results>(`/api/runs/${run.id}/results?summary=true&interpretation_id=${encodeURIComponent(interpretation.id)}`); setActiveRun(run); setDatabaseId(run.database_version_id); setResults(next); setRules(next.capability_rules); setAnalysisScope(next.analysis_scope ?? allScope()); setShowAllHits(false); if (run.hit_thresholds) { setFullEvalue(String(run.hit_thresholds.full_evalue_max)); setDomainIEvalue(String(run.hit_thresholds.domain_i_evalue_max)) }; setEvidenceView('capabilities'); setWorkspaceView('evidence') } catch (caught) { setError((caught as Error).message) } }
+  async function openProject(project: Project) { setActiveProject(project); setResults(null); setActiveRun(null); setWorkspaceView('project'); setError(''); try { const tree = await api.get<AnalysisTree>(`/api/projects/${project.id}/analysis-tree`); setAnalysisTree(tree); const latestRun = tree.databases[0]?.runs[0]; const latestInterpretation = latestRun?.interpretations?.[0]; if (latestRun) { setDatabaseId(latestRun.database_version_id); setActiveRun(await api.get<Run>(`/api/runs/${latestRun.id}`)); if (latestInterpretation) await openSavedInterpretation(latestRun, latestInterpretation) } } catch (caught) { setError((caught as Error).message) } }
+  async function reinterpret(nextRules: CapabilityRule[], nextScope: AnalysisScope): Promise<boolean> { if (!activeRun) return false; setBusy(true); setError(''); try { const next = await api.post<Results>(`/api/runs/${activeRun.id}/interpretations`, { capability_rules: nextRules, analysis_scope: nextScope }); setResults(next); setRules(next.capability_rules); setAnalysisScope(next.analysis_scope); setShowAllHits(false); if (activeProject) await refreshTree(activeProject.id); return true } catch (caught) { setError((caught as Error).message); return false } finally { setBusy(false) } }
+  async function renameSavedInterpretation(run: Run, interpretation: InterpretationInfo) { const proposed = window.prompt(copy.history.rename, interpretation.name ?? ''); if (proposed === null) return; try { await api.patch(`/api/runs/${run.id}/interpretations/${interpretation.id}`, { name: proposed.trim() || null }); if (activeProject) await refreshTree(activeProject.id) } catch (caught) { setError((caught as Error).message) } }
+  const toggleCapabilitySort = (key: CapabilitySortKey) => setCapabilitySort((current) => current.key === key ? { key, direction: current.direction === 'asc' ? 'desc' : 'asc' } : { key, direction: 'asc' })
+  async function importDatabase(form: FormData): Promise<string | undefined> { setBusy(true); try { await api.post('/api/databases', form); await refresh(); return undefined } catch (caught) { return (caught as Error).message } finally { setBusy(false) } }
+  async function renameProjectSample(sampleId: string, displayName: string) { if (!activeProject) return; const current = activeProject.samples.find((sample) => sample.sample_id === sampleId); if (!current || current.display_name === displayName.trim() || !displayName.trim()) return; try { const updated = await api.patch<Project>(`/api/projects/${activeProject.id}/samples/${sampleId}`, { display_name: displayName.trim() }); setActiveProject(updated); await refresh() } catch (caught) { setError((caught as Error).message) } }
+  async function deleteDatabase(item: DatabaseInfo) { if (item.builtin || !window.confirm(copy.confirmations.deleteDatabase(item.name, item.version))) return; try { await api.delete(`/api/databases/${encodeURIComponent(item.version_id)}`); await refresh() } catch (caught) { setError((caught as Error).message) } }
+  async function cancelRun() { if (activeRun) try { setActiveRun(await api.post<Run>(`/api/runs/${activeRun.id}/cancel`)) } catch (caught) { setError((caught as Error).message) } }
+  async function retryRun() { if (activeRun) try { const run = await api.post<Run>(`/api/runs/${activeRun.id}/retry`); setActiveRun(run); setResults(null) } catch (caught) { setError((caught as Error).message) } }
+  async function deleteProject(project: Project) { if (!window.confirm(copy.confirmations.deleteProject(project.name))) return; try { await api.delete(`/api/projects/${project.id}`); if (activeProject?.id === project.id) { setActiveProject(null); setActiveRun(null); setResults(null); setAnalysisTree(null); setWorkspaceView('projects') }; await refresh() } catch (caught) { setError((caught as Error).message) } }
+  async function restoreExample() { setBusy(true); setError(''); try { const project = await api.post<Project>('/api/examples/pd10/restore'); await refresh(); await openProject(project) } catch (caught) { setError((caught as Error).message) } finally { setBusy(false) } }
+
+  const artifactBase = results ? `/api/runs/${results.run_id}/interpretations/${results.interpretation_id}/artifacts` : ''
+  const resultsContext = activeProject && results ? `${activeProject.name} / ${selectedDatabase?.name ?? activeRun?.database_version_id ?? copy.common.unknown} / ${results.interpretation_id.slice(0, 8)}` : copy.header.evidenceFirst
+  const chooseDatabase = (id: string) => {
+    setDatabaseId(id); setAnalysisScope(allScope())
+    const database = databases.find((item) => item.version_id === id)
+    if (database) { setRules(strictRules(database)); setFullEvalue(String(database.threshold_policy.default_full_evalue ?? 1e-5)); setDomainIEvalue(String(database.threshold_policy.default_domain_i_evalue ?? 1e-5)) }
+  }
+  return <div className="atlas-app-shell">
+    <AppMasthead view={workspaceView} hasProject={Boolean(activeProject)} hasResults={Boolean(results)} onNavigate={setWorkspaceView}/>
+    {error && <div className="error-banner atlas-error"><Activity size={16}/><span>{error}</span><button onClick={() => setError('')} aria-label={copy.common.dismissError}>×</button></div>}
+
+    {workspaceView === 'projects' && <ProjectsHome projectCount={projects.length}
+      upload={<div className="atlas-upload-composer">
+        <label className="atlas-upload-name"><span>{copy.upload.projectName}</span><input ref={projectNameRef} aria-label={copy.upload.projectName} value={projectName} onChange={(event) => setProjectName(event.target.value)} placeholder={copy.upload.projectPlaceholder}/></label>
+        <label className="atlas-upload-picker"><UploadCloud size={19}/><span><b>{archiveFile?.name || copy.upload.chooseZip}</b><small>{copy.upload.limits}</small></span><input ref={archiveRef} aria-label={copy.upload.chooseZip} type="file" accept=".zip" hidden onChange={(event) => { const file = event.target.files?.[0] ?? null; setArchiveFile(file); setProjectName((name) => name || file?.name.replace(/\.zip$/i, '') || '') }}/></label>
+        <div className="segmented atlas-input-kind">{(Object.keys(inputLabels) as InputKind[]).map((kind) => <button type="button" className={inputKind === kind ? 'selected' : ''} onClick={() => setInputKind(kind)} key={kind}>{inputLabels[kind]}</button>)}</div>
+        <button className="primary atlas-create-analysis" disabled={busy} onClick={uploadProject}>{busy ? <RefreshCw className="spin" size={17}/> : <ArrowRight size={17}/>} {copy.upload.submit}</button>
+      </div>}
+      projects={<>{projects.length ? projects.map((project, index) => <article className={`atlas-project-card ${activeProject?.id === project.id ? 'active' : ''}`} aria-label={project.name} style={{ '--project-index': index } as CSSProperties} key={project.id}>
+        <button className="atlas-project-open" type="button" onClick={() => openProject(project)}><span>{project.input_kind === 'protein' ? copy.upload.protein : copy.upload.genome}{project.origin === 'bundled_example' && <em className="example-badge">Bundled example</em>}</span><h3>{project.name}</h3><p>{copy.navigation.projectSummary(project.samples?.length || 0, project.status)}</p><i aria-hidden="true"/></button>
+        <button className="icon-button danger atlas-project-delete" type="button" onClick={() => deleteProject(project)} aria-label={copy.confirmations.deleteProjectLabel}><Trash2 size={14}/></button>
+      </article>) : <div className="atlas-empty-state"><h3>{copy.history.empty}</h3><p>{copy.upload.description}</p></div>}{examples.some((item) => item.available && !item.installed) && <button className="secondary restore-example" disabled={busy} onClick={restoreExample}><RefreshCw size={15}/>Restore PD10 example</button>}</>}
+      databases={<div className="atlas-database-ledger" role="table" aria-label={copy.home.databases}><div className="atlas-database-row header" role="row"><span>{copy.navigation.databases}</span><span>Version</span><span>Profiles</span><span>Pathways</span><span/></div>{databases.map((item) => <div className="atlas-database-row db-mini" role="button" tabIndex={0} onClick={() => setDatabaseDetails(item)} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') setDatabaseDetails(item) }} aria-label={`${item.name} ${item.version}`} key={item.version_id}><span><Database size={15}/><b>{item.name}</b><small>{item.classification_scheme}</small></span><span>{item.version}</span><span>{item.profile_count}</span><span>{item.pathway_count}</span><span>{!item.builtin && <button className="icon-button danger" onClick={(event) => { event.stopPropagation(); deleteDatabase(item) }} aria-label={copy.confirmations.deleteDatabaseLabel}><Trash2 size={13}/></button>}</span></div>)}<button className="secondary atlas-import-database" onClick={() => setShowDatabaseGuide(true)}><UploadCloud size={15}/>{copy.navigation.importDatabase}</button></div>}
+    />}
+
+    {workspaceView === 'project' && activeProject && <ProjectWorkspace title={activeProject.name} context={<><span>{activeProject.input_kind === 'protein' ? copy.upload.protein : copy.upload.genome}</span><span>{activeProject.samples.length} samples</span><span>{activeProject.status}</span></>}>
+      <section className="atlas-sample-ledger">
+        <div className="atlas-section-heading"><div><p className="atlas-kicker">{copy.overview.samplesEyebrow}</p><h2>{copy.overview.samplesTitle}</h2></div></div>
+        <div className="sample-table">{activeProject.samples.map((sample) => <div key={sample.sample_id}><span className="sample-icon">{sample.display_name.slice(0,2).toUpperCase()}</span><span><input className="sample-name" defaultValue={sample.display_name} onBlur={(event) => renameProjectSample(sample.sample_id, event.target.value)}/><small>{sample.original_path}</small></span><span>{copy.overview.sequences(sample.sequence_count)}</span><span>{copy.overview.residues(sample.total_residues, sample.input_kind)}</span></div>)}</div>
+      </section>
+      <section className="atlas-configuration">
+        <div className="atlas-section-heading"><div><p className="atlas-kicker">{copy.overview.analysisEyebrow}</p><h2>{copy.overview.analysisTitle}</h2></div><p>{copy.overview.background}</p></div>
+        <div className="atlas-config-grid">
+          <div className="atlas-config-cell span-5"><span>{copy.overview.database}</span><select aria-label={copy.overview.database} value={databaseId} onChange={(event) => chooseDatabase(event.target.value)}>{databases.map((item) => <option value={item.version_id} key={item.version_id}>{item.name} · {item.version}</option>)}</select>{selectedDatabase && <p>{selectedDatabase.classification_scheme} · {copy.overview.pathways(selectedDatabase.pathway_count)}</p>}</div>
+          <div className="atlas-config-cell span-3"><span>{selectedDatabase?.threshold_type === 'ga' ? 'Threshold policy' : 'Thresholds'}</span>{selectedDatabase?.threshold_type === 'evalue' ? <div className="atlas-thresholds"><label>{copy.overview.fullEvalue}<input value={fullEvalue} onChange={(event) => setFullEvalue(event.target.value)}/></label><label>{copy.overview.domainIEvalue}<input value={domainIEvalue} onChange={(event) => setDomainIEvalue(event.target.value)}/></label></div> : <><h3>{copy.overview.ga}</h3><p>Curated profile-specific sequence and domain thresholds</p></>}</div>
+          <div className="atlas-config-cell span-4"><span>{copy.scope.title}</span><h3>{copy.scope.summary(analysisScope.mode, analysisScope.requested_values.length)}</h3><button className="secondary" onClick={() => setShowScope(true)}><Settings2 size={15}/>{copy.scope.configure}</button></div>
+          <div className="atlas-config-cell span-4"><span>{copy.rules.title}</span><h3>{copy.overview.ruleSummary(rules.filter((rule) => rule.strategy === 'all').length, rules.length)}</h3><button className="secondary" onClick={() => setShowRules(true)}><Settings2 size={15}/>{copy.overview.configureRules}</button></div>
+          <div className="atlas-config-cell span-5"><span>{copy.history.title}</span><h3>{copy.history.interpretationCount(savedInterpretationCount)}</h3><p>{activeRun ? copy.history.run(activeRun.created_at, activeRun.id) : copy.history.empty}</p></div>
+          <div className="atlas-config-cell atlas-run-cell span-3"><div><span>{activeRun?.status ?? 'Ready to run'}</span><h3>{selectedDatabase?.name ?? copy.overview.database}</h3></div><button className="primary" disabled={busy || activeRun?.status === 'running' || activeRun?.status === 'queued' || (analysisScope.mode !== 'all' && !analysisScope.requested_values.length)} onClick={startRun}><FlaskConical size={17}/>{copy.overview.start}</button>{activeRun && <><RunProgress run={activeRun} sampleNames={activeSampleNames}/><small>{activeRun.status === 'failed' ? errorMessage(activeRun.error_code) : copy.overview.background}</small>{['queued','running'].includes(activeRun.status) && <button className="text-button" onClick={cancelRun}>{copy.overview.cancel}</button>}{['failed','cancelled'].includes(activeRun.status) && <button className="text-button" onClick={retryRun}><RefreshCw size={13}/>{copy.overview.retry}</button>}</>}</div>
+        </div>
+      </section>
+      <AnalysisHistory tree={analysisTree} activeRunId={activeRun?.id} activeInterpretationId={results?.interpretation_id} onOpen={openSavedInterpretation} onRename={renameSavedInterpretation}/>
+    </ProjectWorkspace>}
+
+    {workspaceView === 'evidence' && results && <EvidenceWorkspace active={evidenceView} onChange={setEvidenceView} context={resultsContext} actions={<button className="secondary" onClick={() => setShowInterpretation(true)}><Settings2 size={15}/>{copy.interpretation.title}</button>}>
+      {evidenceView === 'capabilities' && <section className="atlas-evidence-panel">
+        <div className="atlas-panel-heading"><div><p className="atlas-kicker">{copy.capabilities.eyebrow}</p><h2>{copy.capabilities.title}</h2></div><div className="toolbar"><a className="secondary" href={`${artifactBase}/pathway-capabilities.tsv`}><Download size={15}/>{copy.capabilities.download}</a><a className="secondary" href={`${artifactBase}/biological-annotations.tsv`}><Download size={15}/>{copy.capabilities.annotationsDownload}</a></div></div>
+        <p className="scope-summary">{copy.scope.summary(analysisScope.mode, analysisScope.requested_values.length)}</p>
+        <div className="atlas-command-tray"><EvidenceFilterControls filters={evidenceFilters} onChange={setEvidenceFilters} onExport={() => exportEvidenceView('capabilities', evidenceCapabilities.map((item) => `${item.sample_id}:${item.pathway_id}:${item.role}`), results.result_counts?.capabilities ?? evidenceCapabilities.length)} ruleIds={biologicalRuleIds} baseline={results.result_counts?.capabilities ?? evidenceCapabilities.length} shown={evidenceCapabilities.length}/><div className="capability-controls"><label className="search"><Search size={15}/><input aria-label={copy.capabilities.filter} placeholder={copy.capabilities.filter} value={capabilityFilters.query} onChange={(event) => setCapabilityFilters((filters) => ({ ...filters, query: event.target.value }))}/></label><select aria-label={copy.capabilities.sampleFilter} value={capabilityFilters.sampleId} onChange={(event) => setCapabilityFilters((filters) => ({ ...filters, sampleId: event.target.value }))}><option value="">{copy.capabilities.allSamples}</option>{results.samples.map((sample) => <option value={sample.sample_id} key={sample.sample_id}>{sample.display_name}</option>)}</select><select aria-label={copy.capabilities.pathwayFilter} value={capabilityFilters.pathwayId} onChange={(event) => setCapabilityFilters((filters) => ({ ...filters, pathwayId: event.target.value }))}><option value="">{copy.capabilities.allPathways}</option>{[...new Map(results.capabilities.map((item) => [item.pathway_id, item.pathway_name])).entries()].sort((a,b) => a[1].localeCompare(b[1])).map(([id,name]) => <option value={id} key={id}>{name}</option>)}</select><select aria-label={copy.capabilities.roleFilter} value={capabilityFilters.role} onChange={(event) => setCapabilityFilters((filters) => ({ ...filters, role: event.target.value }))}><option value="">{copy.capabilities.allRoles}</option><option value="sending">{displayRole('sending')}</option><option value="receiving">{displayRole('receiving')}</option></select><select aria-label={copy.capabilities.callFilter} value={capabilityFilters.call} onChange={(event) => setCapabilityFilters((filters) => ({ ...filters, call: event.target.value }))}><option value="">{copy.capabilities.allCalls}</option><option value="capable">{copy.capabilities.capableCall}</option><option value="partial">{copy.capabilities.partial}</option><option value="not_detected">{copy.common.notDetected}</option></select><button className="secondary" onClick={() => setCapabilityFilters(emptyCapabilityFilters())}>{copy.capabilities.clear}</button></div></div>
+        <p className="table-count">{copy.capabilities.count(filteredCapabilities.length, evidenceCapabilities.length)}</p><div className="cap-table"><div className="cap-row header">{copy.capabilities.headers.map((label, index) => { const key = (['sample','pathway','role','completeness','rule','call'] as CapabilitySortKey[])[index]; return <button className={capabilitySort.key === key ? 'active' : ''} aria-label={copy.capabilities.sortBy(label)} onClick={() => toggleCapabilitySort(key)} key={label}>{label}<ArrowUpDown size={11}/></button> })}</div>{pagedCapabilities.map((item) => <div className="cap-row" key={`${item.sample_id}:${item.pathway_id}:${item.role}`}><span><b>{sampleNames.get(item.sample_id)}</b><small>{item.sample_id}</small></span><span><b>{item.pathway_name}</b><small>{item.signal_name}</small></span><span><i className={`role ${item.role}`}>{displayRole(item.role)}</i></span><span>{item.observed_components.length}/{item.total_components}<small>{(item.observed_components_labels ?? item.observed_components).join(', ') || copy.common.notDetected}</small></span><span><b>{displayRuleStrategy(item.rule_strategy)}</b><small>{item.required_profiles.length ? copy.capabilities.required(item.required_profiles_labels ?? item.required_profiles) : copy.capabilities.threshold(item.required_hits)}</small></span><span><i className={`call ${item.capable ? 'pass' : 'muted'}`}>{item.capable ? copy.capabilities.capable(item.role) : capabilityCall(item) === 'partial' ? copy.capabilities.partial : copy.common.notDetected}</i><small>{(item.biological_annotations ?? []).map((annotation) => `${annotation.rule_id}: ${annotation.state}`).join(' · ')}</small></span></div>)}</div>
+        {filteredCapabilities.length > 100 && <div className="pager"><button className="secondary" disabled={capabilityPage === 0} onClick={() => setCapabilityPage((page) => Math.max(0, page - 1))}>{copy.pagination.previous}</button><span>{copy.pagination.range(capabilityPage * 100 + 1, Math.min((capabilityPage + 1) * 100, filteredCapabilities.length), filteredCapabilities.length)}</span><button className="secondary" disabled={(capabilityPage + 1) * 100 >= filteredCapabilities.length} onClick={() => setCapabilityPage((page) => page + 1)}>{copy.pagination.next}</button></div>}
+      </section>}
+      {evidenceView === 'hits' && <section className="atlas-evidence-panel">
+        <div className="atlas-panel-heading"><div><p className="atlas-kicker">{copy.hits.eyebrow}</p><h2>{copy.hits.title}</h2></div><div className="toolbar">{analysisScope.mode !== 'all' && <label className="toggle"><input type="checkbox" checked={showAllHits} onChange={(event) => setShowAllHits(event.target.checked)}/><i/><span>{copy.hits.showAll}</span></label>}<a className="secondary" href={`${artifactBase}/hit-quality-evidence.tsv`}><Download size={16}/>{copy.hits.qualityDownload}</a><ExportButton runId={results.run_id} interpretationId={results.interpretation_id} mode="analysis"/><ExportButton runId={results.run_id} interpretationId={results.interpretation_id} mode="full"/></div></div>
+        <div className="atlas-command-tray"><EvidenceFilterControls filters={evidenceFilters} onChange={setEvidenceFilters} onExport={() => exportEvidenceView('hits', hitRecordIds, hitBaseline)} ruleIds={biologicalRuleIds} baseline={hitBaseline} shown={hitTotal}/></div>
+        {loadingResults && <p className="loading-results"><RefreshCw className="spin" size={13}/>{copy.pagination.loading}</p>}
+        <div className="hits-table"><div className="hit-row header">{copy.hits.headers.map((label) => <span key={label}>{label}</span>)}</div>{visibleHits.map((hit) => <div className="hit-row" key={hit.hit_id}><span><b>{hit.sample_id}</b><small>{hit.sequence_id}</small></span><span><b>{hit.profile_display_label ?? hit.profile_id}</b></span><span><i className={`call ${hit.pass === false ? 'muted' : 'pass'}`}>{hit.pass === false ? copy.hits.failed : copy.hits.passed}</i></span><span>{hit.full_evalue.toExponential(2)}</span><span>{(hit.domain_i_evalue ?? hit.domain_evalue).toExponential(2)}</span><span>{hit.domain_c_evalue === undefined ? copy.common.unknown : hit.domain_c_evalue.toExponential(2)}</span><span>{hit.full_score.toFixed(1)}</span><span>{hit.domain_score.toFixed(1)}</span><span>{hit.hmm_coverage.toFixed(2)}</span><span>{hit.sequence_coverage.toFixed(2)}</span><span>{hit.gene_integrity_state ?? copy.common.unknown}<small>{(hit.competing_profile_labels ?? hit.competing_profile_hits)?.join(', ')}</small></span><span><small>{hit.threshold_rule}</small></span></div>)}</div>
+        {hitTotal > 500 && <div className="pager"><button className="secondary" disabled={hitOffset === 0} onClick={() => setHitOffset((offset) => Math.max(0, offset - 500))}>{copy.pagination.previous}</button><span>{copy.pagination.range(hitOffset + 1, Math.min(hitOffset + visibleHits.length, hitTotal), hitTotal)}</span><button className="secondary" disabled={hitOffset + 500 >= hitTotal} onClick={() => setHitOffset((offset) => offset + 500)}>{copy.pagination.next}</button></div>}
+      </section>}
+    </EvidenceWorkspace>}
+
+    {workspaceView === 'network' && results && visibleNetwork && <NetworkWorkspace context={resultsContext} actions={<div className="toolbar"><button className="secondary" onClick={() => setShowInterpretation(true)}><Settings2 size={15}/>{copy.interpretation.title}</button><label className="toggle"><input type="checkbox" checked={showSelf} onChange={(event) => setShowSelf(event.target.checked)}/><i/><span>{copy.network.showSelf}</span></label><div className="segmented network-modes">{(['minimal','signal','pathway'] as NetworkViewMode[]).map((mode) => <button className={networkMode === mode ? 'selected' : ''} onClick={() => setNetworkMode(mode)} key={mode}>{copy.network.modes[mode]}</button>)}</div><button className="secondary" onClick={() => networkRef.current?.exportCurrentView()}><Download size={15}/>{copy.network.downloads.pdf}</button><div className="download-menu"><a className="secondary" href={`${artifactBase}/network.sif`}>{copy.network.downloads.sif}</a><a className="secondary" href={`${artifactBase}/network-edges.tsv`}>{copy.network.downloads.edges}</a><a className="secondary" href={`${artifactBase}/network-node-metrics.tsv`}>{copy.network.downloads.metrics}</a></div></div>}>
+      <section className="atlas-network-panel"><EvidenceFilterControls filters={evidenceFilters} onChange={setEvidenceFilters} onExport={() => exportEvidenceView('network', evidenceEdges.map((item) => item.id), results.result_counts?.network_edges ?? evidenceEdges.length)} ruleIds={biologicalRuleIds} baseline={results.result_counts?.network_edges ?? evidenceEdges.length} shown={evidenceEdges.length}/><div className="stat-cards">{[[copy.network.stats[0],visibleNetwork.summary.total_nodes],[copy.network.stats[1],visibleNetwork.summary.total_edges],[copy.network.stats[2],renderedEdges.length],[copy.network.stats[3],visibleNetwork.summary.isolated_nodes],[copy.network.stats[4],visibleNetwork.summary.self_edges],[copy.network.stats[5],visibleNetwork.summary.pathway_count],[copy.network.stats[6],visibleNetwork.summary.signal_count]].map(([label,value]) => <div key={String(label)}><span>{label}</span><b>{value}</b></div>)}</div><NetworkView ref={networkRef} results={results} evidenceEdges={evidenceEdges} showSelf={showSelf} mode={networkMode}/><div className="network-legend">{networkMode === 'minimal' && results.network.legend.length > 1 && <span><i style={{background:'#70766f'}}/>{copy.network.multipleSignals}</span>}{results.network.legend.map((item) => <span key={item.signal_name}><i style={{background:item.color}}/>{item.signal_name}</span>)}</div><div className="metrics-table"><div className="metric-row header">{copy.network.headers.map((label) => <span key={label}>{label}</span>)}</div>{visibleNetwork.rows.map((item) => <div className="metric-row" key={item.sample_id}><b>{item.display_name}</b><span>{item.in_degree}</span><span>{item.out_degree}</span><span>{item.total_degree}</span><span>{item.unique_neighbors}</span><span>{item.self_edge_count}</span></div>)}</div><p className="disclaimer">{copy.network.disclaimer}</p></section>
+    </NetworkWorkspace>}
+
+    {showRules && selectedDatabase && <RuleEditor database={selectedDatabase} rules={rules} scope={analysisScope} onChange={setRules} onClose={() => setShowRules(false)}/>} {showScope && selectedDatabase && <ScopeEditor database={selectedDatabase} scope={analysisScope} onChange={setAnalysisScope} onClose={() => setShowScope(false)}/>} {showInterpretation && selectedDatabase && <InterpretationSettings database={selectedDatabase} appliedRules={rules} appliedScope={analysisScope} onApply={reinterpret} onClose={() => setShowInterpretation(false)}/>} {showDatabaseGuide && <DatabaseGuide busy={busy} onSubmit={importDatabase} onClose={() => setShowDatabaseGuide(false)}/>} {databaseDetails && <DatabaseDetails database={databaseDetails} onClose={() => setDatabaseDetails(null)}/>}
+  </div>
+}

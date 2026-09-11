@@ -1,0 +1,141 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: qscn-tool/frontend/package-lock.json
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: qscn-tool/frontend
+      - name: Test frontend
+        run: npm test
+        working-directory: qscn-tool/frontend
+      - name: Build frontend
+        run: npm run build
+        working-directory: qscn-tool/frontend
+      - name: Audit frontend dependencies
+        run: npm audit --audit-level=high
+        working-directory: qscn-tool/frontend
+
+  container:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            arch: amd64
+          - platform: linux/arm64
+            arch: arm64
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8 # v4.2.0
+      - uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
+      - name: Build ${{ matrix.platform }} image
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          context: ./qscn-tool
+          platforms: ${{ matrix.platform }}
+          load: true
+          tags: qscn:ci-${{ matrix.arch }}
+          build-args: |
+            QSCN_BUILD_REVISION=${{ github.sha }}
+            QSCN_BUILD_TIMESTAMP=ci
+          cache-from: type=gha,scope=qscn-${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=qscn-${{ matrix.arch }}
+      - name: Run backend and packaging tests
+        run: >-
+          docker run --rm --platform ${{ matrix.platform }}
+          -v "$GITHUB_WORKSPACE/qscn-tool:/workspace:ro" -w /workspace
+          -e PYTHONPATH=/workspace/backend qscn:ci-${{ matrix.arch }}
+          python -m unittest discover -s tests -v
+      - name: Verify bundled tools and database indexes
+        run: >-
+          docker run --rm --platform ${{ matrix.platform }} qscn:ci-${{ matrix.arch }}
+          sh -c 'hmmscan -h >/dev/null && prodigal -v >/dev/null 2>&1 &&
+          test -f /app/database-runtime/QSPdatabase.hmm.h3p &&
+          test -f /app/database-runtime/kegg_m02024.hmm.h3p'
+
+  windows-launcher:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Parse PowerShell launcher
+        shell: powershell
+        run: |
+          $tokens = $null
+          $parseErrors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path 'qscn-tool/packaging/windows/qscn.ps1'),
+            [ref]$tokens,
+            [ref]$parseErrors
+          ) | Out-Null
+          if ($parseErrors.Count) { $parseErrors | Format-List | Out-String | Write-Error }
+      - name: Test PowerShell launcher behavior
+        shell: powershell
+        run: qscn-tool/tests/windows_launcher.ps1
+
+  shell-launchers:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            script: qscn-tool/packaging/linux/qscn.sh
+            wrapper: qscn-tool/packaging/linux/qscn.sh
+          - os: macos-latest
+            script: qscn-tool/packaging/macos/qscn.sh
+            wrapper: qscn-tool/packaging/macos/Q-SCOPE.command
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Parse and inspect launcher
+        shell: bash
+        run: |
+          sh -n "${{ matrix.script }}"
+          sh -n "${{ matrix.wrapper }}"
+          test -x "${{ matrix.script }}"
+          test -x "${{ matrix.wrapper }}"
+
+  release-packages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Build three platform packages
+        env:
+          QSCN_RELEASE_OUTPUT_DIR: ${{ runner.temp }}/qscn-releases
+        run: >-
+          ./qscn-tool/scripts/package_release.sh 1.0.0
+          ghcr.io/emmettpeng/qscn@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      - name: Verify checksums and package contents
+        env:
+          RELEASE_DIR: ${{ runner.temp }}/qscn-releases
+        shell: bash
+        run: |
+          cd "$RELEASE_DIR"
+          sha256sum --check SHA256SUMS
+          unzip -q Q-SCOPE-v1.0.0-windows.zip -d windows
+          unzip -q Q-SCOPE-v1.0.0-macos.zip -d macos
+          tar -xzf Q-SCOPE-v1.0.0-linux.tar.gz -C .
+          test -f windows/Q-SCOPE-v1.0.0-windows/windows/Q-SCOPE.cmd
+          test -f macos/Q-SCOPE-v1.0.0-macos/macos/Q-SCOPE.command
+          test -x Q-SCOPE-v1.0.0-linux/linux/Q-SCOPE.sh
+          test -f Q-SCOPE-v1.0.0-linux/.env.example
+          grep -q 'ghcr.io/emmettpeng/qscn@sha256:aaaa' Q-SCOPE-v1.0.0-linux/compose.yml
+          ! grep -q '__QSCN_IMAGE__' Q-SCOPE-v1.0.0-linux/compose.yml
+          ! grep -q 'down -v' windows/Q-SCOPE-v1.0.0-windows/windows/qscn.ps1
+          ! grep -q 'down -v' macos/Q-SCOPE-v1.0.0-macos/macos/qscn.sh
+          ! grep -q 'down -v' Q-SCOPE-v1.0.0-linux/linux/Q-SCOPE.sh

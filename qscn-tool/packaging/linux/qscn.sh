@@ -1,0 +1,157 @@
+#!/bin/sh
+set -eu
+
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+COMPOSE_FILE="$SCRIPT_DIR/compose.yml"
+ENV_FILE="$SCRIPT_DIR/.env"
+ENV_EXAMPLE="$SCRIPT_DIR/.env.example"
+REDIS_IMAGE="redis:7.2.15-alpine@sha256:05a97a479bc73de66f087dc05b569010772880f778cc8671fa6b8aadee32e5c6"
+
+initialize_env() {
+  [ -f "$ENV_FILE" ] || [ ! -f "$ENV_EXAMPLE" ] || cp "$ENV_EXAMPLE" "$ENV_FILE"
+}
+
+compose() {
+  docker compose --project-directory "$SCRIPT_DIR" -f "$COMPOSE_FILE" "$@"
+}
+
+port() {
+  value=""
+  if [ -f "$ENV_FILE" ]; then
+    value=$(awk -F= '$1 == "QSCN_PORT" {print $2; exit}' "$ENV_FILE" | tr -d '[:space:]')
+  fi
+  case "${value:-8000}" in
+    *[!0-9]*|'') printf '%s\n' "Invalid QSCN_PORT in .env" >&2; exit 1 ;;
+    *) printf '%s' "${value:-8000}" ;;
+  esac
+}
+
+doctor() {
+  command -v docker >/dev/null 2>&1 || {
+    printf '%s\n' "Install Docker Engine and Docker Compose v2: https://docs.docker.com/engine/install/ubuntu/" >&2
+    exit 1
+  }
+  docker compose version >/dev/null 2>&1 || {
+    printf '%s\n' "Docker Compose v2 is required: https://docs.docker.com/compose/install/linux/" >&2
+    exit 1
+  }
+  os_type=$(docker info --format '{{.OSType}}' 2>/dev/null || true)
+  [ "$os_type" = "linux" ] || {
+    printf '%s\n' "The Docker Linux engine is unavailable. Start Docker and ensure this user can access it." >&2
+    exit 1
+  }
+  case "$(uname -m)" in
+    x86_64|amd64|aarch64|arm64) ;;
+    *) printf '%s\n' "Unsupported Linux CPU architecture: $(uname -m)" >&2; exit 1 ;;
+  esac
+  free_kb=$(df -Pk "$SCRIPT_DIR" | awk 'NR == 2 {print $4}')
+  [ "${free_kb:-0}" -ge 41943040 ] || printf '%s\n' "Warning: less than 40 GB free disk space is available." >&2
+  memory_kb=$(awk '/^MemTotal:/ {print $2; exit}' /proc/meminfo 2>/dev/null || printf '0')
+  [ "${memory_kb:-0}" -ge 16777216 ] || printf '%s\n' "Warning: 16 GB host memory is recommended." >&2
+}
+
+wait_ready() {
+  qscn_port=$(port)
+  attempt=0
+  while [ "$attempt" -lt 120 ]; do
+    if curl --fail --silent --max-time 2 "http://127.0.0.1:${qscn_port}/api/readiness" >/dev/null 2>&1; then
+      printf '%s\n' "Q-SCOPE is ready at http://127.0.0.1:${qscn_port}"
+      return 0
+    fi
+    attempt=$((attempt + 1))
+    sleep 1
+  done
+  printf '%s\n' "Q-SCOPE did not become ready within 120 seconds." >&2
+  compose ps >&2 || true
+  compose logs --tail=100 app worker redis >&2 || true
+  return 1
+}
+
+port_is_listening() {
+  qscn_port="$1"
+  if command -v lsof >/dev/null 2>&1; then
+    lsof -nP -iTCP:"$qscn_port" -sTCP:LISTEN >/dev/null 2>&1
+  elif command -v ss >/dev/null 2>&1; then
+    [ -n "$(ss -ltnH "sport = :$qscn_port" 2>/dev/null)" ]
+  else
+    return 1
+  fi
+}
+
+open_browser() {
+  url="$1"
+  if command -v xdg-open >/dev/null 2>&1; then
+    xdg-open "$url" >/dev/null 2>&1 || true
+  elif command -v gio >/dev/null 2>&1; then
+    gio open "$url" >/dev/null 2>&1 || true
+  else
+    printf '%s\n' "Open $url in a browser."
+  fi
+}
+
+start() {
+  doctor
+  qscn_port=$(port)
+  if port_is_listening "$qscn_port" && [ -z "$(compose ps -q app 2>/dev/null || true)" ]; then
+    printf '%s\n' "Port ${qscn_port} is already in use. Change QSCN_PORT in .env." >&2
+    exit 1
+  fi
+  compose pull
+  compose up -d
+  wait_ready
+  [ "${QSCN_NO_BROWSER:-0}" = "1" ] || open_browser "http://127.0.0.1:${qscn_port}"
+}
+
+backup() {
+  doctor
+  backup_root="${2:-$SCRIPT_DIR/backups}"
+  timestamp=$(date -u +%Y%m%dT%H%M%SZ)
+  target="$backup_root/qscn-$timestamp"
+  mkdir -p "$target"
+  compose stop app worker redis
+  trap 'compose up -d >/dev/null 2>&1 || true' EXIT INT TERM
+  docker run --rm -v qscope_data:/source:ro -v "$target:/backup" "$REDIS_IMAGE" \
+    sh -c 'tar -czf /backup/qscn-data.tar.gz -C /source .'
+  docker run --rm -v qscope_redis:/source:ro -v "$target:/backup" "$REDIS_IMAGE" \
+    sh -c 'tar -czf /backup/qscn-redis.tar.gz -C /source .'
+  (cd "$target" && sha256sum qscn-data.tar.gz qscn-redis.tar.gz > SHA256SUMS)
+  compose up -d
+  trap - EXIT INT TERM
+  printf '%s\n' "Backup written to $target"
+}
+
+restore() {
+  doctor
+  source_dir="${2:-}"
+  [ -n "$source_dir" ] && [ -f "$source_dir/qscn-data.tar.gz" ] && [ -f "$source_dir/qscn-redis.tar.gz" ] || {
+    printf '%s\n' "Usage: ./linux/Q-SCOPE.sh restore /path/to/qscn-backup" >&2
+    exit 1
+  }
+  printf '%s' "This replaces the current Q-SCOPE volumes. Type RESTORE to continue: "
+  read -r confirmation
+  [ "$confirmation" = "RESTORE" ] || { printf '%s\n' "Restore cancelled."; exit 1; }
+  source_dir=$(CDPATH= cd -- "$source_dir" && pwd)
+  compose down
+  docker volume create qscope_data >/dev/null
+  docker volume create qscope_redis >/dev/null
+  docker run --rm -v qscope_data:/target -v "$source_dir:/backup:ro" "$REDIS_IMAGE" \
+    sh -c 'find /target -mindepth 1 -maxdepth 1 -exec rm -rf -- {} + && tar -xzf /backup/qscn-data.tar.gz -C /target'
+  docker run --rm -v qscope_redis:/target -v "$source_dir:/backup:ro" "$REDIS_IMAGE" \
+    sh -c 'find /target -mindepth 1 -maxdepth 1 -exec rm -rf -- {} + && tar -xzf /backup/qscn-redis.tar.gz -C /target'
+  compose up -d
+  wait_ready
+}
+
+initialize_env
+command_name="${1:-start}"
+case "$command_name" in
+  start) start ;;
+  stop) compose stop ;;
+  status) compose ps ;;
+  logs) compose logs --follow --tail=200 app worker redis ;;
+  update) doctor; compose pull; compose up -d; wait_ready ;;
+  backup) backup "$@" ;;
+  restore) restore "$@" ;;
+  doctor) doctor; printf '%s\n' "Docker and host checks passed." ;;
+  *) printf '%s\n' "Usage: $0 {start|stop|status|logs|update|backup [directory]|restore BACKUP_DIRECTORY|doctor}" >&2; exit 2 ;;
+esac

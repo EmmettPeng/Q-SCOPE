@@ -1,0 +1,26 @@
+{
+  "example_format_version": "1.0",
+  "example_id": "pd10",
+  "name": "PD10",
+  "sample_count": 10,
+  "input_kind": "genome",
+  "analysis_database_id": "qsp",
+  "analysis_database_version": "builtin-v2",
+  "threshold_type": "ga",
+  "capability_strategy": "all",
+  "archive_sha256": "4791a6e178aa4b0934b0ed5d6d5771fa83a0e94556137dafa6deca6ff5c5caa0",
+  "hits_sha256": "b8f4e43d134f331a244a5462de9536e2ce49cbf9829f01a94efb4eb6491cf922",
+  "asset_bytes": 48766424,
+  "included": [
+    "PD10.zip",
+    "hits.json",
+    "predictions/*.predicted_genes.json"
+  ],
+  "excluded": [
+    "HMMER text output",
+    "temporary scan files",
+    "duplicate runs",
+    "generated export archives"
+  ],
+  "notes": "The saved QSP hits are reinterpreted against the bundled current QSP manifest when the example is installed. Original nucleotide input remains available for a new analysis run."
+}

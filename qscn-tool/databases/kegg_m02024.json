@@ -1,0 +1,1960 @@
+{
+  "schema_version": "2.0",
+  "components": [
+    {
+      "profile_id": "K00494",
+      "display_name": "LuxA"
+    },
+    {
+      "profile_id": "K01114",
+      "display_name": "PlcA"
+    },
+    {
+      "profile_id": "K01218",
+      "display_name": "ManA"
+    },
+    {
+      "profile_id": "K01318",
+      "display_name": "SprE"
+    },
+    {
+      "profile_id": "K01364",
+      "display_name": "SpeB"
+    },
+    {
+      "profile_id": "K01399",
+      "display_name": "LasB"
+    },
+    {
+      "profile_id": "K01497",
+      "display_name": "ToxB"
+    },
+    {
+      "profile_id": "K01580",
+      "display_name": "GadA/B"
+    },
+    {
+      "profile_id": "K01626",
+      "display_name": "PhzC"
+    },
+    {
+      "profile_id": "K01635",
+      "display_name": "LacD.1"
+    },
+    {
+      "profile_id": "K01657",
+      "display_name": "PhnA"
+    },
+    {
+      "profile_id": "K01658",
+      "display_name": "PhnB"
+    },
+    {
+      "profile_id": "K01728",
+      "display_name": "Pel"
+    },
+    {
+      "profile_id": "K01897",
+      "display_name": "RpfB"
+    },
+    {
+      "profile_id": "K01995",
+      "display_name": "NA"
+    },
+    {
+      "profile_id": "K01996",
+      "display_name": "NA"
+    },
+    {
+      "profile_id": "K01997",
+      "display_name": "NA"
+    },
+    {
+      "profile_id": "K01998",
+      "display_name": "NA"
+    },
+    {
+      "profile_id": "K01999",
+      "display_name": "NA"
+    },
+    {
+      "profile_id": "K02031",
+      "display_name": "Dpp"
+    },
+    {
+      "profile_id": "K02032",
+      "display_name": "Dpp"
+    },
+    {
+      "profile_id": "K02033",
+      "display_name": "Dpp"
+    },
+    {
+      "profile_id": "K02034",
+      "display_name": "Dpp"
+    },
+    {
+      "profile_id": "K02035",
+      "display_name": "Dpp"
+    },
+    {
+      "profile_id": "K02052",
+      "display_name": "NA"
+    },
+    {
+      "profile_id": "K02053",
+      "display_name": "NA"
+    },
+    {
+      "profile_id": "K02054",
+      "display_name": "NA"
+    },
+    {
+      "profile_id": "K02055",
+      "display_name": "NA"
+    },
+    {
+      "profile_id": "K02250",
+      "display_name": "ComK"
+    },
+    {
+      "profile_id": "K02251",
+      "display_name": "ComQ"
+    },
+    {
+      "profile_id": "K02252",
+      "display_name": "ComS"
+    },
+    {
+      "profile_id": "K02253",
+      "display_name": "ComX"
+    },
+    {
+      "profile_id": "K02402",
+      "display_name": "FlhC"
+    },
+    {
+      "profile_id": "K02403",
+      "display_name": "FlhD"
+    },
+    {
+      "profile_id": "K02490",
+      "display_name": "Spo0F"
+    },
+    {
+      "profile_id": "K03070",
+      "display_name": "Sec"
+    },
+    {
+      "profile_id": "K03071",
+      "display_name": "Sec"
+    },
+    {
+      "profile_id": "K03073",
+      "display_name": "Sec"
+    },
+    {
+      "profile_id": "K03075",
+      "display_name": "Sec"
+    },
+    {
+      "profile_id": "K03076",
+      "display_name": "Sec"
+    },
+    {
+      "profile_id": "K03106",
+      "display_name": "Sec"
+    },
+    {
+      "profile_id": "K03110",
+      "display_name": "Sec"
+    },
+    {
+      "profile_id": "K03210",
+      "display_name": "Sec"
+    },
+    {
+      "profile_id": "K03217",
+      "display_name": "Sec, CcfA"
+    },
+    {
+      "profile_id": "K03400",
+      "display_name": "LuxC"
+    },
+    {
+      "profile_id": "K03666",
+      "display_name": "Hfq"
+    },
+    {
+      "profile_id": "K06046",
+      "display_name": "LuxE"
+    },
+    {
+      "profile_id": "K06352",
+      "display_name": "PhrA"
+    },
+    {
+      "profile_id": "K06353",
+      "display_name": "PhrC"
+    },
+    {
+      "profile_id": "K06354",
+      "display_name": "PhrE"
+    },
+    {
+      "profile_id": "K06355",
+      "display_name": "PhrF"
+    },
+    {
+      "profile_id": "K06356",
+      "display_name": "PhrG"
+    },
+    {
+      "profile_id": "K06358",
+      "display_name": "PhrK"
+    },
+    {
+      "profile_id": "K06359",
+      "display_name": "RapA"
+    },
+    {
+      "profile_id": "K06360",
+      "display_name": "RapB"
+    },
+    {
+      "profile_id": "K06361",
+      "display_name": "RapC"
+    },
+    {
+      "profile_id": "K06363",
+      "display_name": "RapE"
+    },
+    {
+      "profile_id": "K06364",
+      "display_name": "RapF"
+    },
+    {
+      "profile_id": "K06365",
+      "display_name": "RapG"
+    },
+    {
+      "profile_id": "K06366",
+      "display_name": "RapH"
+    },
+    {
+      "profile_id": "K06369",
+      "display_name": "RapK"
+    },
+    {
+      "profile_id": "K06375",
+      "display_name": "Spo0B"
+    },
+    {
+      "profile_id": "K06998",
+      "display_name": "PhzF"
+    },
+    {
+      "profile_id": "K07173",
+      "display_name": "LuxS"
+    },
+    {
+      "profile_id": "K07344",
+      "display_name": "Trb"
+    },
+    {
+      "profile_id": "K07645",
+      "display_name": "QseC"
+    },
+    {
+      "profile_id": "K07666",
+      "display_name": "QseB"
+    },
+    {
+      "profile_id": "K07667",
+      "display_name": "KdpE"
+    },
+    {
+      "profile_id": "K07680",
+      "display_name": "ComP"
+    },
+    {
+      "profile_id": "K07691",
+      "display_name": "ComA"
+    },
+    {
+      "profile_id": "K07692",
+      "display_name": "DegU"
+    },
+    {
+      "profile_id": "K07699",
+      "display_name": "Spo0A"
+    },
+    {
+      "profile_id": "K07706",
+      "display_name": "AgrC"
+    },
+    {
+      "profile_id": "K07707",
+      "display_name": "AgrA"
+    },
+    {
+      "profile_id": "K07711",
+      "display_name": "QseE"
+    },
+    {
+      "profile_id": "K07715",
+      "display_name": "QseF"
+    },
+    {
+      "profile_id": "K07781",
+      "display_name": "RcsA"
+    },
+    {
+      "profile_id": "K07782",
+      "display_name": "SdiA"
+    },
+    {
+      "profile_id": "K07800",
+      "display_name": "AgrD"
+    },
+    {
+      "profile_id": "K07813",
+      "display_name": "AgrD"
+    },
+    {
+      "profile_id": "K08321",
+      "display_name": "LsrF"
+    },
+    {
+      "profile_id": "K08605",
+      "display_name": "GelE"
+    },
+    {
+      "profile_id": "K08642",
+      "display_name": "LasA"
+    },
+    {
+      "profile_id": "K08777",
+      "display_name": "NprB"
+    },
+    {
+      "profile_id": "K09823",
+      "display_name": "Zur"
+    },
+    {
+      "profile_id": "K09936",
+      "display_name": "ToxF"
+    },
+    {
+      "profile_id": "K10555",
+      "display_name": "LsrB"
+    },
+    {
+      "profile_id": "K10556",
+      "display_name": "LsrC"
+    },
+    {
+      "profile_id": "K10557",
+      "display_name": "LsrD"
+    },
+    {
+      "profile_id": "K10558",
+      "display_name": "LsrA"
+    },
+    {
+      "profile_id": "K10715",
+      "display_name": "RpfC"
+    },
+    {
+      "profile_id": "K10823",
+      "display_name": "Opp"
+    },
+    {
+      "profile_id": "K10909",
+      "display_name": "LuxQ"
+    },
+    {
+      "profile_id": "K10910",
+      "display_name": "LuxP"
+    },
+    {
+      "profile_id": "K10911",
+      "display_name": "LuxU"
+    },
+    {
+      "profile_id": "K10912",
+      "display_name": "LuxO"
+    },
+    {
+      "profile_id": "K10913",
+      "display_name": "HapR"
+    },
+    {
+      "profile_id": "K10914",
+      "display_name": "Clp"
+    },
+    {
+      "profile_id": "K10915",
+      "display_name": "CqsA"
+    },
+    {
+      "profile_id": "K10916",
+      "display_name": "CqsS"
+    },
+    {
+      "profile_id": "K10917",
+      "display_name": "AphA"
+    },
+    {
+      "profile_id": "K11006",
+      "display_name": "StxA"
+    },
+    {
+      "profile_id": "K11007",
+      "display_name": "StxB"
+    },
+    {
+      "profile_id": "K11031",
+      "display_name": "PfoA"
+    },
+    {
+      "profile_id": "K11033",
+      "display_name": "Nhe"
+    },
+    {
+      "profile_id": "K11034",
+      "display_name": "Nhe"
+    },
+    {
+      "profile_id": "K11035",
+      "display_name": "Hbl"
+    },
+    {
+      "profile_id": "K11036",
+      "display_name": "Hbl"
+    },
+    {
+      "profile_id": "K11037",
+      "display_name": "Hbl"
+    },
+    {
+      "profile_id": "K11039",
+      "display_name": "hld"
+    },
+    {
+      "profile_id": "K11063",
+      "display_name": "TcdA/B"
+    },
+    {
+      "profile_id": "K11216",
+      "display_name": "LsrK"
+    },
+    {
+      "profile_id": "K11530",
+      "display_name": "LsrG"
+    },
+    {
+      "profile_id": "K11531",
+      "display_name": "LsrR"
+    },
+    {
+      "profile_id": "K11752",
+      "display_name": "ToxE"
+    },
+    {
+      "profile_id": "K12257",
+      "display_name": "Sec"
+    },
+    {
+      "profile_id": "K12292",
+      "display_name": "ComA"
+    },
+    {
+      "profile_id": "K12293",
+      "display_name": "ComB"
+    },
+    {
+      "profile_id": "K12294",
+      "display_name": "ComD"
+    },
+    {
+      "profile_id": "K12295",
+      "display_name": "ComE"
+    },
+    {
+      "profile_id": "K12296",
+      "display_name": "ComX"
+    },
+    {
+      "profile_id": "K12415",
+      "display_name": "ComC"
+    },
+    {
+      "profile_id": "K12789",
+      "display_name": "EspFu"
+    },
+    {
+      "profile_id": "K12990",
+      "display_name": "RhlC"
+    },
+    {
+      "profile_id": "K13060",
+      "display_name": "LasI"
+    },
+    {
+      "profile_id": "K13061",
+      "display_name": "RhlI/PhzI"
+    },
+    {
+      "profile_id": "K13062",
+      "display_name": "LuxM/AinS"
+    },
+    {
+      "profile_id": "K13063",
+      "display_name": "PhzE"
+    },
+    {
+      "profile_id": "K13075",
+      "display_name": "BlcC"
+    },
+    {
+      "profile_id": "K13815",
+      "display_name": "RpfG"
+    },
+    {
+      "profile_id": "K13816",
+      "display_name": "RpfF"
+    },
+    {
+      "profile_id": "K14051",
+      "display_name": "RpfR"
+    },
+    {
+      "profile_id": "K14645",
+      "display_name": "CylA"
+    },
+    {
+      "profile_id": "K14982",
+      "display_name": "CiaH"
+    },
+    {
+      "profile_id": "K14983",
+      "display_name": "CiaR"
+    },
+    {
+      "profile_id": "K15580",
+      "display_name": "Opp"
+    },
+    {
+      "profile_id": "K15581",
+      "display_name": "Opp"
+    },
+    {
+      "profile_id": "K15582",
+      "display_name": "Opp"
+    },
+    {
+      "profile_id": "K15583",
+      "display_name": "Opp"
+    },
+    {
+      "profile_id": "K15654",
+      "display_name": "SrfAA"
+    },
+    {
+      "profile_id": "K15655",
+      "display_name": "SrfAB"
+    },
+    {
+      "profile_id": "K15656",
+      "display_name": "SrfAC"
+    },
+    {
+      "profile_id": "K15657",
+      "display_name": "SrfAD"
+    },
+    {
+      "profile_id": "K15850",
+      "display_name": "LuxN/AinR"
+    },
+    {
+      "profile_id": "K15852",
+      "display_name": "LuxR"
+    },
+    {
+      "profile_id": "K15853",
+      "display_name": "LuxD"
+    },
+    {
+      "profile_id": "K15854",
+      "display_name": "LuxB"
+    },
+    {
+      "profile_id": "K16619",
+      "display_name": "Cpa"
+    },
+    {
+      "profile_id": "K17940",
+      "display_name": "PqsH"
+    },
+    {
+      "profile_id": "K18000",
+      "display_name": "PqsA"
+    },
+    {
+      "profile_id": "K18001",
+      "display_name": "PqsB"
+    },
+    {
+      "profile_id": "K18002",
+      "display_name": "PqsC"
+    },
+    {
+      "profile_id": "K18003",
+      "display_name": "PqsD"
+    },
+    {
+      "profile_id": "K18096",
+      "display_name": "RpaI/RhiI"
+    },
+    {
+      "profile_id": "K18098",
+      "display_name": "RpaR"
+    },
+    {
+      "profile_id": "K18099",
+      "display_name": "RhlR"
+    },
+    {
+      "profile_id": "K18100",
+      "display_name": "RhlA"
+    },
+    {
+      "profile_id": "K18101",
+      "display_name": "RhlB"
+    },
+    {
+      "profile_id": "K18139",
+      "display_name": "ToxI"
+    },
+    {
+      "profile_id": "K18304",
+      "display_name": "LasR"
+    },
+    {
+      "profile_id": "K18306",
+      "display_name": "ToxG"
+    },
+    {
+      "profile_id": "K18307",
+      "display_name": "ToxH"
+    },
+    {
+      "profile_id": "K18315",
+      "display_name": "Car"
+    },
+    {
+      "profile_id": "K18316",
+      "display_name": "Car"
+    },
+    {
+      "profile_id": "K18317",
+      "display_name": "Car"
+    },
+    {
+      "profile_id": "K18318",
+      "display_name": "Car"
+    },
+    {
+      "profile_id": "K18319",
+      "display_name": "Car"
+    },
+    {
+      "profile_id": "K19666",
+      "display_name": "CepR/TofR"
+    },
+    {
+      "profile_id": "K19731",
+      "display_name": "CciR"
+    },
+    {
+      "profile_id": "K19732",
+      "display_name": "TraR"
+    },
+    {
+      "profile_id": "K19733",
+      "display_name": "AvsR"
+    },
+    {
+      "profile_id": "K19734",
+      "display_name": "ExpR/CarR/EsaR"
+    },
+    {
+      "profile_id": "K19735",
+      "display_name": "PqsR"
+    },
+    {
+      "profile_id": "K20086",
+      "display_name": "VioA"
+    },
+    {
+      "profile_id": "K20087",
+      "display_name": "VioB"
+    },
+    {
+      "profile_id": "K20088",
+      "display_name": "VioE"
+    },
+    {
+      "profile_id": "K20089",
+      "display_name": "VioD"
+    },
+    {
+      "profile_id": "K20090",
+      "display_name": "VioC"
+    },
+    {
+      "profile_id": "K20248",
+      "display_name": "CinI"
+    },
+    {
+      "profile_id": "K20249",
+      "display_name": "RaiI"
+    },
+    {
+      "profile_id": "K20250",
+      "display_name": "CciI"
+    },
+    {
+      "profile_id": "K20252",
+      "display_name": "CinR"
+    },
+    {
+      "profile_id": "K20253",
+      "display_name": "BisR"
+    },
+    {
+      "profile_id": "K20256",
+      "display_name": "LuxG"
+    },
+    {
+      "profile_id": "K20257",
+      "display_name": "PqsE"
+    },
+    {
+      "profile_id": "K20258",
+      "display_name": "LecA"
+    },
+    {
+      "profile_id": "K20259",
+      "display_name": "LecB"
+    },
+    {
+      "profile_id": "K20260",
+      "display_name": "PhzA/B"
+    },
+    {
+      "profile_id": "K20261",
+      "display_name": "PhzD"
+    },
+    {
+      "profile_id": "K20262",
+      "display_name": "PhzG"
+    },
+    {
+      "profile_id": "K20263",
+      "display_name": "FusK"
+    },
+    {
+      "profile_id": "K20264",
+      "display_name": "FusR"
+    },
+    {
+      "profile_id": "K20265",
+      "display_name": "GadC"
+    },
+    {
+      "profile_id": "K20266",
+      "display_name": "Trb"
+    },
+    {
+      "profile_id": "K20267",
+      "display_name": "Trb"
+    },
+    {
+      "profile_id": "K20268",
+      "display_name": "RhiA"
+    },
+    {
+      "profile_id": "K20269",
+      "display_name": "RhiB"
+    },
+    {
+      "profile_id": "K20270",
+      "display_name": "RhiC"
+    },
+    {
+      "profile_id": "K20271",
+      "display_name": "AccR"
+    },
+    {
+      "profile_id": "K20272",
+      "display_name": "TraM"
+    },
+    {
+      "profile_id": "K20273",
+      "display_name": "ZmpA"
+    },
+    {
+      "profile_id": "K20274",
+      "display_name": "ZmpB"
+    },
+    {
+      "profile_id": "K20275",
+      "display_name": "AidA"
+    },
+    {
+      "profile_id": "K20276",
+      "display_name": "BapA"
+    },
+    {
+      "profile_id": "K20277",
+      "display_name": "Bcl"
+    },
+    {
+      "profile_id": "K20321",
+      "display_name": "NlmA"
+    },
+    {
+      "profile_id": "K20322",
+      "display_name": "NlmB"
+    },
+    {
+      "profile_id": "K20323",
+      "display_name": "NlmC"
+    },
+    {
+      "profile_id": "K20324",
+      "display_name": "NlmD"
+    },
+    {
+      "profile_id": "K20325",
+      "display_name": "FhrR"
+    },
+    {
+      "profile_id": "K20326",
+      "display_name": "XagA"
+    },
+    {
+      "profile_id": "K20327",
+      "display_name": "XagB"
+    },
+    {
+      "profile_id": "K20328",
+      "display_name": "XagC"
+    },
+    {
+      "profile_id": "K20329",
+      "display_name": "QsmR"
+    },
+    {
+      "profile_id": "K20330",
+      "display_name": "ToxJ"
+    },
+    {
+      "profile_id": "K20331",
+      "display_name": "ToxA"
+    },
+    {
+      "profile_id": "K20332",
+      "display_name": "ToxC"
+    },
+    {
+      "profile_id": "K20333",
+      "display_name": "ToxD"
+    },
+    {
+      "profile_id": "K20334",
+      "display_name": "CviR"
+    },
+    {
+      "profile_id": "K20335",
+      "display_name": "PSMalpha"
+    },
+    {
+      "profile_id": "K20336",
+      "display_name": "PSMalpha"
+    },
+    {
+      "profile_id": "K20337",
+      "display_name": "PSMbeta"
+    },
+    {
+      "profile_id": "K20338",
+      "display_name": "Rot"
+    },
+    {
+      "profile_id": "K20339",
+      "display_name": "AgrC2"
+    },
+    {
+      "profile_id": "K20340",
+      "display_name": "AgrA2"
+    },
+    {
+      "profile_id": "K20341",
+      "display_name": "CipI"
+    },
+    {
+      "profile_id": "K20342",
+      "display_name": "ComR"
+    },
+    {
+      "profile_id": "K20343",
+      "display_name": "BlpC"
+    },
+    {
+      "profile_id": "K20344",
+      "display_name": "BlpA"
+    },
+    {
+      "profile_id": "K20345",
+      "display_name": "BlpB"
+    },
+    {
+      "profile_id": "K20373",
+      "display_name": "Rgg2"
+    },
+    {
+      "profile_id": "K20374",
+      "display_name": "Rgg3"
+    },
+    {
+      "profile_id": "K20375",
+      "display_name": "RopB"
+    },
+    {
+      "profile_id": "K20376",
+      "display_name": "PrgQ"
+    },
+    {
+      "profile_id": "K20377",
+      "display_name": "PrgX"
+    },
+    {
+      "profile_id": "K20378",
+      "display_name": "iAD"
+    },
+    {
+      "profile_id": "K20379",
+      "display_name": "cAD1"
+    },
+    {
+      "profile_id": "K20380",
+      "display_name": "TraA"
+    },
+    {
+      "profile_id": "K20381",
+      "display_name": "TraE1"
+    },
+    {
+      "profile_id": "K20382",
+      "display_name": "Asa1"
+    },
+    {
+      "profile_id": "K20383",
+      "display_name": "CylLL"
+    },
+    {
+      "profile_id": "K20384",
+      "display_name": "CylLS"
+    },
+    {
+      "profile_id": "K20385",
+      "display_name": "CylM"
+    },
+    {
+      "profile_id": "K20386",
+      "display_name": "CylB"
+    },
+    {
+      "profile_id": "K20387",
+      "display_name": "CylR1"
+    },
+    {
+      "profile_id": "K20388",
+      "display_name": "CylR2"
+    },
+    {
+      "profile_id": "K20389",
+      "display_name": "PhrH"
+    },
+    {
+      "profile_id": "K20390",
+      "display_name": "PapR"
+    },
+    {
+      "profile_id": "K20391",
+      "display_name": "PlcR"
+    },
+    {
+      "profile_id": "K20480",
+      "display_name": "NprR"
+    },
+    {
+      "profile_id": "K20481",
+      "display_name": "NprX"
+    },
+    {
+      "profile_id": "K20482",
+      "display_name": "NisA"
+    },
+    {
+      "profile_id": "K20483",
+      "display_name": "NisB"
+    },
+    {
+      "profile_id": "K20484",
+      "display_name": "NisC"
+    },
+    {
+      "profile_id": "K20485",
+      "display_name": "NisT"
+    },
+    {
+      "profile_id": "K20486",
+      "display_name": "NisP"
+    },
+    {
+      "profile_id": "K20487",
+      "display_name": "NisK"
+    },
+    {
+      "profile_id": "K20488",
+      "display_name": "NisR"
+    },
+    {
+      "profile_id": "K20489",
+      "display_name": "NisI"
+    },
+    {
+      "profile_id": "K20490",
+      "display_name": "NisF"
+    },
+    {
+      "profile_id": "K20491",
+      "display_name": "NisE"
+    },
+    {
+      "profile_id": "K20492",
+      "display_name": "NisG"
+    },
+    {
+      "profile_id": "K20494",
+      "display_name": "NisG"
+    },
+    {
+      "profile_id": "K20527",
+      "display_name": "Trb"
+    },
+    {
+      "profile_id": "K20528",
+      "display_name": "Trb"
+    },
+    {
+      "profile_id": "K20529",
+      "display_name": "Trb"
+    },
+    {
+      "profile_id": "K20530",
+      "display_name": "Trb"
+    },
+    {
+      "profile_id": "K20531",
+      "display_name": "Trb"
+    },
+    {
+      "profile_id": "K20532",
+      "display_name": "Trb"
+    },
+    {
+      "profile_id": "K20533",
+      "display_name": "Trb"
+    },
+    {
+      "profile_id": "K20539",
+      "display_name": "BlcR"
+    },
+    {
+      "profile_id": "K20540",
+      "display_name": "CepR2"
+    },
+    {
+      "profile_id": "K20552",
+      "display_name": "Ler"
+    },
+    {
+      "profile_id": "K20555",
+      "display_name": "Trb"
+    },
+    {
+      "profile_id": "K22954",
+      "display_name": "LuxI"
+    },
+    {
+      "profile_id": "K22955",
+      "display_name": "TraI"
+    },
+    {
+      "profile_id": "K22956",
+      "display_name": "ExpI"
+    },
+    {
+      "profile_id": "K22957",
+      "display_name": "CviI"
+    },
+    {
+      "profile_id": "K22968",
+      "display_name": "AvsI"
+    },
+    {
+      "profile_id": "K23133",
+      "display_name": "ComC"
+    },
+    {
+      "profile_id": "K25873",
+      "display_name": "RaiR"
+    }
+  ],
+  "pathways": {
+    "Vibrio_LuxS_LuxPQ_system": [
+      {
+        "Signal_type": "AI-2"
+      },
+      {
+        "Signal_Sending": [
+          "K07173"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K10910",
+          "K10909",
+          "K10911",
+          "K10912"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1128/JCM.05895-11",
+          "https://doi.org/10.1016/j.ijmm.2006.01.044",
+          "https://doi.org/10.1146/annurev.cellbio.21.012704.131001",
+          "https://doi.org/10.1128/JB.186.20.6902-6914.2004",
+          "https://doi.org/10.1128/JB.179.12.4043-4045.1997",
+          "https://doi.org/10.1016/S0092-8674(02)00829-2",
+          "https://doi.org/10.1046/j.1365-2958.1999.01208.x"
+        ]
+      }
+    ],
+    "Vibrio_LuxM_LuxN_system": [
+      {
+        "Signal_type": "AI-1"
+      },
+      {
+        "Signal_Sending": [
+          "K13062"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K15850",
+          "K10911",
+          "K10912"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1128/JB.181.18.5766-5770.1999",
+          "https://doi.org/10.1046/j.1365-2958.2000.01684.x",
+          "https://doi.org/10.1016/j.ijmm.2006.01.044",
+          "https://doi.org/10.1146/annurev.cellbio.21.012704.131001",
+          "https://doi.org/10.1128/JB.186.20.6902-6914.2004",
+          "https://doi.org/10.1016/S0092-8674(02)00829-2",
+          "https://doi.org/10.1046/j.1365-2958.1999.01208.x"
+        ]
+      }
+    ],
+    "Vibrio_CqsA_CqsS_system": [
+      {
+        "Signal_type": "CAI-1"
+      },
+      {
+        "Signal_Sending": [
+          "K10915"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K10916",
+          "K10911",
+          "K10912"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1016/S0092-8674(02)00829-2",
+          "https://doi.org/10.1016/j.ijmm.2006.01.044",
+          "https://doi.org/10.1146/annurev.cellbio.21.012704.131001",
+          "https://doi.org/10.1128/JB.186.20.6902-6914.2004",
+          "https://doi.org/10.1046/j.1365-2958.1999.01208.x"
+        ]
+      }
+    ],
+    "Vibrio_LuxI_LuxR_system": [
+      {
+        "Signal_type": "AI-1"
+      },
+      {
+        "Signal_Sending": [
+          "K22954"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K15852"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1073/pnas.93.18.9505",
+          "https://doi.org/10.1016/j.ijmm.2006.01.044",
+          "https://doi.org/10.1038/msb.2011.30"
+        ]
+      }
+    ],
+    "Pseudomonas_aeruginosa_LasI_LasR_system": [
+      {
+        "Signal_type": "AI-1"
+      },
+      {
+        "Signal_Sending": [
+          "K13060"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K18304"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1073/pnas.93.18.9505",
+          "https://doi.org/10.1111/j.1365-2958.2004.04211.x",
+          "https://doi.org/10.1128/MMBR.05007-11"
+        ]
+      }
+    ],
+    "Pseudomonas_aeruginosa_Pqs_operon_system": [
+      {
+        "Signal_type": "HHQ/PQS"
+      },
+      {
+        "Signal_Sending": [
+          "K01657",
+          "K01658",
+          "K18000",
+          "K18001",
+          "K18002",
+          "K18003",
+          "K20257",
+          "K17940"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K19735"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1128/jb.172.2.884-900.1990",
+          "https://doi.org/10.1074/jbc.M804555200",
+          "https://doi.org/10.1021/bi9009055",
+          "https://doi.org/10.1074/jbc.M804555200",
+          "https://doi.org/10.1128/JB.00753-08",
+          "https://doi.org/10.1111/j.1365-2958.2010.07303.x",
+          "https://doi.org/10.1371/journal.ppat.0030035"
+        ]
+      }
+    ],
+    "Pseudomonas_aeruginosa_PhlI_PhlR_system/Pseudomonas_PhzI_PhzR_system": [
+      {
+        "Signal_type": "AI-1"
+      },
+      {
+        "Signal_Sending": [
+          "K13061"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K18099"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1021/bi048005m"
+        ]
+      }
+    ],
+    "Escherichia_coli_LsrABC_system": [
+      {
+        "Signal_type": "AI-2"
+      },
+      {
+        "Signal_Sending": [
+          "K07173"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K10555",
+          "K10556",
+          "K10557",
+          "K10558",
+          "K11216",
+          "K11531"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1128/JCM.05895-11",
+          "https://doi.org/10.1016/S0923-2508(01)01201-3",
+          "https://doi.org/10.1046/j.1365-2958.2001.02669.x",
+          "https://doi.org/10.1021/ja4024989",
+          "https://doi.org/10.1128/JB.187.1.238-248.2005",
+          "https://doi.org/10.1128/JB.187.6.2066-2076.2005",
+          "https://doi.org/10.1128/JB.00014-07"
+        ]
+      }
+    ],
+    "Rhodopseudomonas_palustris_RpaI_RpaR_system": [
+      {
+        "Signal_type": "AI-1"
+      },
+      {
+        "Signal_Sending": [
+          "K18096"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K18098"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1073/pnas.1114125108",
+          "https://doi.org/10.1038/nature07088",
+          "https://doi.org/10.1073/pnas.1103821108",
+          "https://doi.org/10.1073/pnas.1114125108"
+        ]
+      }
+    ],
+    "Rhizobium_leguminosarum_CinI_CinR_system": [
+      {
+        "Signal_type": "AI-1"
+      },
+      {
+        "Signal_Sending": [
+          "K20248"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K20252"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1046/j.1365-2958.2000.01960.x",
+          "https://doi.org/10.1046/j.1365-2958.2003.03699.x"
+        ]
+      }
+    ],
+    "Rhizobium_leguminosarum_CinI_BisR_system": [
+      {
+        "Signal_type": "AI-1"
+      },
+      {
+        "Signal_Sending": [
+          "K20248"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K20253"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1046/j.1365-2958.2000.01960.x",
+          "https://doi.org/10.1046/j.1365-2958.2003.03699.x"
+        ]
+      }
+    ],
+    "TraI_TraR_system": [
+      {
+        "Signal_type": "AI-1"
+      },
+      {
+        "Signal_Sending": [
+          "K22955"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K19732"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1046/j.1365-2958.2003.03699.x",
+          "https://doi.org/10.1038/362448a0"
+        ]
+      }
+    ],
+    "Rhizobium_leguminosarum_RaiI_RaiR_system": [
+      {
+        "Signal_type": "AI-1"
+      },
+      {
+        "Signal_Sending": [
+          "K20249"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K25873"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1128/JB.180.4.815-821.1998",
+          "https://doi.org/10.1128/JB.184.6.1597-1606.2002"
+        ]
+      }
+    ],
+    "Rhizobium_leguminosarum_RhiI_RhiR_system": [
+      {
+        "Signal_type": "AI-1"
+      },
+      {
+        "Signal_Sending": [
+          "K18096"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K18098"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1073/pnas.1114125108",
+          "https://doi.org/10.1038/nature07088",
+          "https://doi.org/10.1073/pnas.1103821108",
+          "https://doi.org/10.1073/pnas.1114125108"
+        ]
+      }
+    ],
+    "Erwinia_Serratia_ExpI_ExpR_system": [
+      {
+        "Signal_type": "AI-1"
+      },
+      {
+        "Signal_Sending": [
+          "K22956"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K19734"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1046/j.1365-2958.1998.01022.x",
+          "https://doi.org/10.1128/AEM.69.7.3901-3910.2003"
+        ]
+      }
+    ],
+    "Pantoea_stewartii_EsaI_EsaR_system": [
+      {
+        "Signal_type": "AI-1"
+      },
+      {
+        "Signal_Sending": [
+          "K22956"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K19734"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1046/j.1365-2958.1998.01022.x",
+          "https://doi.org/10.1128/AEM.69.7.3901-3910.2003"
+        ]
+      }
+    ],
+    "Bcc_CepI_CepR_system": [
+      {
+        "Signal_type": "AI-1"
+      },
+      {
+        "Signal_Sending": [
+          "K13061"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K19666"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1021/bi048005m",
+          "https://doi.org/10.1128/JB.179.22.7089-7097.1997",
+          "https://doi.org/10.1146/annurev-phyto-081211-173000"
+        ]
+      }
+    ],
+    "Bcc_CciI_CciR_system": [
+      {
+        "Signal_type": "AI-1"
+      },
+      {
+        "Signal_Sending": [
+          "K20250"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K19731"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1128/IAI.73.8.4982-4992.2005",
+          "https://doi.org/10.1186/1471-2164-10-441"
+        ]
+      }
+    ],
+    "Bcc_Rpf_system": [
+      {
+        "Signal_type": "BDSF"
+      },
+      {
+        "Signal_Sending": [
+          "K13816"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K14051"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1146/annurev.phyto.45.062806.094342",
+          "https://doi.org/10.1126/stke.121pe23",
+          "https://doi.org/10.1046/j.1365-2958.1997.3721736.x",
+          "https://doi.org/10.1111/j.1365-2958.2006.05440.x",
+          "https://doi.org/10.1128/JB.00424-15"
+        ]
+      }
+    ],
+    "Xanthomonas_campestris_Rpf_system": [
+      {
+        "Signal_type": "DSF"
+      },
+      {
+        "Signal_Sending": [
+          "K01897",
+          "K13816"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K10715",
+          "K13815"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1146/annurev.phyto.45.062806.094342",
+          "https://doi.org/10.1126/stke.121pe23",
+          "https://doi.org/10.1046/j.1365-2958.1997.3721736.x",
+          "https://doi.org/10.1073/pnas.0600345103"
+        ]
+      }
+    ],
+    "Burkholderia_glumae_TofI_TofR_system": [
+      {
+        "Signal_type": "AI-1"
+      },
+      {
+        "Signal_Sending": [
+          "K13061"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K19666"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1021/bi048005m",
+          "https://doi.org/10.1128/JB.179.22.7089-7097.1997",
+          "https://doi.org/10.1146/annurev-phyto-081211-173000"
+        ]
+      }
+    ],
+    "Chromobacterium_violaceum_CviI_CviR_system": [
+      {
+        "Signal_type": "AI-1"
+      },
+      {
+        "Signal_Sending": [
+          "K22957"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K20334"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1128/JB.05125-11"
+        ]
+      }
+    ],
+    "Agrobacterium_vitiae_AvsI_AvsR_system": [
+      {
+        "Signal_type": "AI-1"
+      },
+      {
+        "Signal_Sending": [
+          "K22968"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K19733"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1128/JB.184.20.5686-5695.2002",
+          "https://doi.org/10.1007/s10482-007-9201-3"
+        ]
+      }
+    ],
+    "Staphylococcus_aureus_AIP_system": [
+      {
+        "Signal_type": "AIP"
+      },
+      {
+        "Signal_Sending": [
+          "K07800",
+          "K07813"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K07706",
+          "K07707"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1128/iai.68.5.2579-2586.2000",
+          "https://doi.org/10.1074/jbc.M205367200",
+          "https://doi.org/10.1111/j.1574-6968.1998.tb13018.x"
+        ]
+      }
+    ],
+    "Clostridium_difficile_AIP_system": [
+      {
+        "Signal_type": "AIP"
+      },
+      {
+        "Signal_Sending": [
+          "K07800",
+          "K07813"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K20339",
+          "K20340"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1128/iai.68.5.2579-2586.2000",
+          "https://doi.org/10.1074/jbc.M205367200",
+          "https://doi.org/10.1128/mBio.02569-14"
+        ]
+      }
+    ],
+    "Streptococcus_ComC(K12415)_ComD_system": [
+      {
+        "Signal_type": "CSP"
+      },
+      {
+        "Signal_Sending": [
+          "K12415",
+          "K12292",
+          "K12293"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K12294",
+          "K12295"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1016/j.femsle.2005.09.008",
+          "https://doi.org/10.1016/j.tim.2006.06.007",
+          "https://doi.org/10.1016/0378-1119(94)00841-F",
+          "https://doi.org/10.1128/JB.01053-09"
+        ]
+      }
+    ],
+    "Streptococcus_ComC(K23133)_ComD_system": [
+      {
+        "Signal_type": "CSP"
+      },
+      {
+        "Signal_Sending": [
+          "K23133",
+          "K12292",
+          "K12293"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K12294",
+          "K12295"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1111/j.1574-6968.2006.00593.x",
+          "https://doi.org/10.1016/j.tim.2006.06.007",
+          "https://doi.org/10.1016/0378-1119(94)00841-F",
+          "https://doi.org/10.1128/JB.01053-09"
+        ]
+      }
+    ],
+    "Streptococcus_BlpC_system": [
+      {
+        "Signal_type": "Blp"
+      },
+      {
+        "Signal_Sending": [
+          "K20343",
+          "K20344",
+          "K20345"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K07706",
+          "K07707"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1128/mBio.00179-11",
+          "https://doi.org/10.1074/jbc.273.36.23134",
+          "https://doi.org/10.1111/j.1574-6968.1998.tb13018.x"
+        ]
+      }
+    ],
+    "pCF10_Donor_produced_inhibitor": [
+      {
+        "Signal_type": "iCF10"
+      },
+      {
+        "Signal_Sending": [
+          "K20376"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K15580",
+          "K15581",
+          "K15582",
+          "K15583",
+          "K10823",
+          "K20377"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1128/JB.176.23.7405-7408.1994",
+          "https://doi.org/10.1529/biophysj.107.120964",
+          "https://doi.org/10.1128/JB.01760-06",
+          "https://doi.org/10.1128/JB.00274-07",
+          "https://doi.org/10.1074/jbc.M404343200",
+          "https://doi.org/10.1006/plas.1996.0005"
+        ]
+      }
+    ],
+    "pCF10_Recipient_produced_activator": [
+      {
+        "Signal_type": "cCF10"
+      },
+      {
+        "Signal_Sending": [
+          "K03217"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K15580",
+          "K15581",
+          "K15582",
+          "K15583",
+          "K10823",
+          "K20377"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1074/jbc.M403229200",
+          "https://doi.org/10.1016/j.tim.2007.03.001",
+          "https://doi.org/10.1529/biophysj.107.120964",
+          "https://doi.org/10.1128/JB.01760-06",
+          "https://doi.org/10.1128/JB.00274-07",
+          "https://doi.org/10.1074/jbc.M404343200",
+          "https://doi.org/10.1006/plas.1996.0005"
+        ]
+      }
+    ],
+    "pAD1_Donor_produced_inhibitor": [
+      {
+        "Signal_type": "iAD1"
+      },
+      {
+        "Signal_Sending": [
+          "K20378"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K15580",
+          "K15581",
+          "K15582",
+          "K15583",
+          "K10823",
+          "K20380"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1016/0147-619X(90)90019-9",
+          "https://doi.org/10.1529/biophysj.107.120964",
+          "https://doi.org/10.1128/JB.01760-06",
+          "https://doi.org/10.1128/JB.00274-07",
+          "https://doi.org/10.1074/jbc.M404343200",
+          "https://doi.org/10.1128/JB.174.6.1821-1827.1992"
+        ]
+      }
+    ],
+    "pAD1_Recipient_produced_activator": [
+      {
+        "Signal_type": "cAD1"
+      },
+      {
+        "Signal_Sending": [
+          "K20379"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K15580",
+          "K15581",
+          "K15582",
+          "K15583",
+          "K10823",
+          "K20380"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1128/JB.184.7.1880-1887.2002",
+          "https://doi.org/10.1529/biophysj.107.120964",
+          "https://doi.org/10.1128/JB.01760-06",
+          "https://doi.org/10.1128/JB.00274-07",
+          "https://doi.org/10.1074/jbc.M404343200",
+          "https://doi.org/10.1128/JB.174.6.1821-1827.1992"
+        ]
+      }
+    ],
+    "Enterococcus_faecalis_GBAP_system": [
+      {
+        "Signal_type": "GBAP"
+      },
+      {
+        "Signal_Sending": [
+          "K07813"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K07706",
+          "K07707"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1128/iai.68.5.2579-2586.2000",
+          "https://doi.org/10.1074/jbc.M205367200",
+          "https://doi.org/10.1111/j.1574-6968.1998.tb13018.x"
+        ]
+      }
+    ],
+    "Bacillus_ComQXPA_system": [
+      {
+        "Signal_type": "ComX"
+      },
+      {
+        "Signal_Sending": [
+          "K02253",
+          "K02251"
+        ]
+      },
+      {
+        "Signal_Receiving": [
+          "K07680",
+          "K07691"
+        ]
+      },
+      {
+        "References": [
+          "https://doi.org/10.1111/j.1365-2958.2005.04749.x"
+        ]
+      }
+    ]
+  }
+}

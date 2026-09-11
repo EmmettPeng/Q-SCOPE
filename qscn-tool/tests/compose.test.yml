@@ -1,0 +1,13 @@
+name: qscope-release-test
+
+services:
+  app:
+    image: qscn:1.0.0
+  worker:
+    image: qscn:1.0.0
+
+volumes:
+  qscope_data:
+    name: qscope_test_data
+  qscope_redis:
+    name: qscope_test_redis

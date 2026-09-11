@@ -1,0 +1,26 @@
+{
+  "qsp": {
+    "source_url": "https://github.com/chunxiao-dcx/QSP",
+    "source_version": "Dai et al., Water Research 235 (2023) 119814, doi:10.1016/j.watres.2023.119814; upstream repository has no tagged release and bundled-file snapshot correspondence remains unconfirmed",
+    "build_date": "published upstream NR snapshot: 2021-11-11; bundled artifact build date unconfirmed",
+    "build_method": "published upstream method: 38 HMMs constructed from 4,024 seed sequences collected through literature review, QSDB, UniProt and NCBI, followed by NR homolog search, keyword confirmation and profile-specific GA optimization; bundled artifact provenance to an exact upstream commit remains unconfirmed",
+    "license": "Published as an open sequence database and publicly downloadable from the upstream repository; no explicit repository license file was identified, so applicable upstream terms still require confirmation; redistribution with QSCN confirmed by the project owner on 2026-08-10",
+    "redistribution_status": "confirmed",
+    "profile_count": 38,
+    "metadata_reference_count": 29,
+    "hmm_sha256": "8ced1a9f9ad4ba34dcd0557e48ae6041b1991d811307b244285cd8a16a67c5f5",
+    "metadata_sha256": "69d3b2b328d0668352136a880366894d093af57cce81d176825fad8e4324f726"
+  },
+  "kegg-m02024": {
+    "source_url": "https://www.kegg.jp/pathway/map02024",
+    "source_version": "KEGG map02024 reference pathway; extraction date/KEGG release and profile source version unconfirmed",
+    "build_date": "unconfirmed",
+    "build_method": "pathway roles were manually extracted from the KEGG map02024 reference pathway; organism names in pathway labels identify model systems shown on the reference map and are not taxonomic restrictions; component display names were imported from the project-owner-supplied kegg_symbols_and_names.txt PROTEIN NAME IN KEGG column, with blank values represented as NA; construction of the combined 281-profile KEGG-derived HMM library remains unconfirmed",
+    "license": "KEGG terms apply; redistribution with QSCN confirmed by the project owner on 2026-08-10",
+    "redistribution_status": "confirmed",
+    "profile_count": 281,
+    "metadata_reference_count": 83,
+    "hmm_sha256": "a4409af5a3596c057697db1d5f6259f9f07df05f6d55bef629eed3290a8037f0",
+    "metadata_sha256": "42594b65a713b60f8b84e36ccc0109b92759cdae81d641af5faa8516309fa953"
+  }
+}
